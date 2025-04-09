@@ -1,0 +1,1038 @@
+automacro wxsetting {
+  ConfigKeyNot wx_map_monsterSticking -1, wx_map_npcSticking -1, wx_map_playersSticking -1, wx_map_portalSticking 5, wx_map_route 1
+  overrideAI 1
+  CheckOnAI auto, manual, off
+  exclusive 1
+  run-once 1
+  call {
+	do conf wx_map_monsterSticking -1
+    do conf wx_map_npcSticking -1
+    do conf wx_map_playersSticking -1
+    do conf wx_map_portalSticking 5
+    do conf wx_map_route 1
+  }
+  timeout 15
+}
+
+automacro initialize {
+  JobID 0
+  CheckOnAI auto, manual
+  exclusive 1
+  run-once 1
+  call {
+#    if (&defined($configs) == 0) {
+#      log [Tutorial] Setting up config array
+#      @configs = ()
+#    }
+#    if (!&config (route_step) == 15) {
+#      do conf route_step 15
+#    }
+#    if (!&config (skillsAddAuto) == 1) {
+#      do conf skillsAddAuto 1
+#      do conf skillsAddAuto_list NV_BASIC 9
+#    }
+#    if (!&config (debug_tutorial_step) =~ /^.+$/) {
+#      add_key("debug_tutorial_step","1")
+#      add_key("debug_tutorial_battle","-1")
+#    }
+
+#    lock tutorial_battle_on
+    lock tutorial_battle_off
+
+    do ai manual
+  }
+  timeout 15
+}
+
+automacro tutorial_battle_on {
+  ConfigKeyNot route_step 15, skillsAddAuto 1, skillsAddAuto_list NV_BASIC 9, itemsTakeAuto 0, attackAuto -1, route_randomWalk  0, tankMode 1
+  exclusive 1
+  call set_config
+}
+
+#automacro tutorial_battle_on {
+#  ConfigKey debug_tutorial_battle 1
+#  ConfigKeyNot itemsTakeAuto 1, attackAuto 2, route_randomWalk 1, tankMode 0
+#  CheckOnAI auto, manual
+#  exclusive 1
+#  run-once 1
+#  call {
+#    &push(@configs, $.ConfigKeyNotLastKey)
+#	&push(@configs, $.ConfigKeyNotLastKeyValue)
+#	do conf $.ConfigKeyNotLastKey $.ConfigKeyNotLastWantedValue
+#  }
+#}
+
+automacro tutorial_battle_off {
+  ConfigKey debug_tutorial_battle 0
+  CheckOnAI auto, manual
+  exclusive 1
+  call {
+    while (@configs > 0) {
+	  do conf &shift(@configs) &shift(@configs)
+	  pause 1
+	}
+  }
+}
+
+#automacro initialize_tutorial {
+#  ConfigKeyNot debug_tutorial_step 1, debug_tutorial_battle 0
+#  CheckOnAI manual
+#  exclusive 1
+#  call set_config
+#}
+
+#automacro initialize_configs {
+#  ConfigKeyNot route_step 15, skillsAddAuto 1, skillsAddAuto_list NV_BASIC 9, itemsTakeAuto 0, attackAuto -1, route_randomWalk  0, tankMode 1
+#  exclusive 1
+#  call set_config
+#}
+
+macro set_config {
+  if ($.ConfigKeyNotLastKeyValue == none) {
+    add_key($.ConfigKeyNotLastKey, $.ConfigKeyNotLastWantedValue)
+  } else {
+    do conf $.ConfigKeyNotLastKey $.ConfigKeyNotLastWantedValue
+  }
+}
+
+macro do_tutorial_battle {
+  lock initialize_configs
+  release tutorial_battle_on
+  do conf debug_tutorial_battle 1
+  do ai on
+}
+
+automacro tutorial1 {
+  InMapRegex /^iz_int(0[1|2|3|4])?$/
+  CheckOnAI manual
+  exclusive 1
+  priority 1
+  run-once 1
+  call {
+    log [Tutorial] Begin move out from ship
+    do move 27 30
+    do talk 1
+    do move 56 15
+  }
+  timeout 15
+}
+
+automacro tutorial2 {
+  InMapRegex /^int_land(0[1|2|3|4])?$/
+  QuestActive 21001
+  CheckOnAI manual
+  exclusive 1
+  run-once 1
+  call {
+    log [Tutorial] Report to captain to get buff
+    do talknpc 78 103 r0
+    call do_tutorial_battle
+  }
+  timeout 15
+}
+
+automacro tutorial2_1 {
+  InMapRegex /^int_land(0[1|2|3|4])?$/
+  QuestActive 21008
+#  ConfigKey debug_tutorial_step 2
+  StatusInactiveHandle EFST_BLESSING
+  exclusive 1
+  call {
+#    do ai manual
+    do move 78 100
+    do talknpc 78 103
+#    do ai on
+  }
+}
+
+automacro tutorial3 {
+  InMapRegex /^int_land(0[1|2|3|4])?$/
+  InInventory "Wood" >= 3
+  QuestActive 21008
+#  ConfigKey debug_tutorial_step 2
+  exclusive 1
+  run-once 1
+  call {
+    log [Tutorial] Report to sailor to hand over Wood
+	do conf debug_tutorial_step 3
+	do conf debug_tutorial_battle 0
+	do ai manual
+    do move 61 71
+    do talknpc 58 69
+    do move 78 100
+    do talknpc 78 103
+    do talknpc 73 100
+    do talknpc 73 100 r0
+	do move izlude 196 209
+    do ai on
+  }
+  timeout 15
+}
+
+automacro tutorial4 {
+  exclusive 1
+  InMapRegex /^izlude(_[a|b|c|d])?$/
+  IsInCoordinate 196 209
+#  QuestInactive 7472
+#  ConfigKey debug_tutorial_step 3
+  run-once 1
+  call {
+    log [Tutorial] Report to captain again in izlude
+	do conf debug_tutorial_step 4
+	do talknpc 198 213 r0
+  }
+  timeout 15
+}
+
+automacro tutorial5 {
+  exclusive 1
+  InMapRegex /^izlude(_[a|b|c|d])?$/
+  QuestActive 7472
+  CharCurrentWeight < 1000
+#  ConfigKey debug_tutorial_step 4
+  run-once 1
+  call {
+    log [Tutorial] Report to academy staff
+	do conf debug_tutorial_step 5
+	do move 128 205
+	do talknpc 122 207
+	do is &inventory (Apple Juice)
+    do talknpc 122 207 r0
+	$map = replace_string($.InMapRegexLast,"izlude","iz_ac01")
+	do move $map 108 37
+	do talknpc 100 39 r0
+	$map = replace_string($map,"1","2")
+	do move $map 207 27
+	do ai manual
+  }
+  timeout 15
+}
+
+automacro tutorial6 {
+  exclusive 1
+  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
+  CheckOnAI manual
+  run-once 1
+  call {
+
+  }
+}
+
+automacro tutorial6_1 {
+  exclusive 1
+  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
+  InInventory "Swordman Manual" == 0
+#  ConfigKey debug_tutorial_step 5
+  CheckOnAI manual
+  run-once 1
+  call {
+    log [Tutorial] Get Swordman Manual
+	do conf debug_tutorial_step 6.1
+	do move 64 49
+	do talknpc 60 51 r1
+  }
+  timeout 15
+}
+
+automacro tutorial6_1_1 {
+  exclusive 1
+  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
+  QuestActive 1229
+  CheckOnAI manual
+  run-once 1
+  call {
+	log [Tutorial] Swordsman training
+	do move 64 49
+	do talknpc 60 51 r4
+	do talknpc 60 51
+	do eq leftAccessory &inventory (Swordman Manual) #Prepare for thief quest
+  }
+  timeout 15
+}
+
+automacro tutorial6_2 {
+  exclusive 1
+  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
+  InInventory "Taekwon Manual" == 0
+#  ConfigKey debug_tutorial_step 6.1
+  CheckOnAI manual
+  run-once 1
+  call {
+    log [Tutorial] Get Taekwon Manual
+	do conf debug_tutorial_step 6.2
+	do move 72 83
+	do talknpc 70 85 r0
+	do talknpc 70 85 r0 r1
+  }
+  timeout 15
+}
+
+automacro tutorial6_3 {
+  exclusive 1
+  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
+  InInventory "Gunslinger Manual" == 0
+  ConfigKey debug_tutorial_step 6.2
+  CheckOnAI manual
+  run-once 1
+  call {
+    log [Tutorial] Get Gunslinger Manual
+	do conf debug_tutorial_step 6.3
+	do move 140 83
+	do talknpc 142 85 r1 r0
+  }
+  timeout 15
+}
+
+automacro tutorial6_4 {
+  exclusive 1
+  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
+  InInventory "Mage Manual" == 0
+  ConfigKey debug_tutorial_step 6.3
+  CheckOnAI manual
+  run-once 1
+  call {
+    log [Tutorial] Get Mage Manual
+	do conf debug_tutorial_step 6.4
+    do move 146 112
+	do talknpc 148 110 r0 r3
+  }
+  timeout 15
+}
+
+automacro tutorial6_4_1 {
+  exclusive 1
+  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
+  ConfigKey debug_tutorial_step 6.4
+  CheckOnAI manual
+  run-once 1
+  call {
+	do eq &inventory (Mage Manual) #Prepare for thief quest
+  }
+  timeout 15
+}
+
+automacro tutorial6_5 {
+  exclusive 1
+  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
+  InInventory "Archer Manual" == 0
+  ConfigKey debug_tutorial_step 6.4
+  CheckOnAI manual
+  run-once 1
+  call {
+    log [Tutorial] Get Archer Manual
+	do conf debug_tutorial_step 6.5
+	do move 67 107
+	do talknpc 65 109 r1 r1
+  }
+  timeout 15
+}
+
+automacro tutorial6_6 {
+  exclusive 1
+  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
+  InInventory "Thief Manual" == 0
+  ConfigKey debug_tutorial_step 6.5
+  CheckOnAI manual
+  run-once 1
+  call {
+    log [Tutorial] Get Thief Manual
+	do conf debug_tutorial_step 6.6
+	do move 54 134
+	do talknpc 52 136 r0 r0
+	do talknpc 49 134 r0 r1
+	do talknpc 49 134 r1
+	do talknpc 55 134 r0 r4
+	do talknpc 52 136
+  }
+  timeout 15
+}
+
+automacro tutorial6_6_1 {
+  exclusive 1
+  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
+  QuestActive 7483
+  CheckOnAI manual
+  run-once 1
+  call {
+    log [Tutorial] Use Thief manual
+	do talknpc 49 134
+	do talknpc 55 134 r0
+	do eq &inventory (Thief Manual)
+  }
+  timeout 15
+}
+
+automacro tutorial6_6_2 {
+  #exclusive 1
+  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
+  MobNear /^Poring$/
+  QuestActive 7484, 7485
+  CheckOnAI manual
+  call {
+    log [Tutorial] Steal from poring and kill it with envenom
+	@pos = getPos($.MobNearLastPos,0,-2)
+	if ($pos[1] < 133) {
+	  $pos[1] = 133
+	}
+	do move $pos[0] $pos[1]
+	while (&invamount (Stone) == 0) {
+	  do sm TF_STEAL $.MobNearLastBinId
+	  pause 1
+	}
+	#if ($.sp < 24) {
+	#  do sit
+	#  while ($.sp < 24) {
+	#    pause 5
+	#  }
+	#  do stand
+	#}
+	do sm TF_POISON $.MobNearLastBinId
+	pause 1
+	do sm TF_POISON $.MobNearLastBinId
+	do talknpc 49 134
+	do talknpc 55 134
+	do talknpc 52 136
+  }
+  timeout 15
+}
+
+automacro tutorial6_6_3 {
+  exclusive 1
+  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
+  CurrentSP < 10
+  QuestActive 7484
+  CheckOnAI manual
+  call {
+    do sit
+	while ($.CurrentSPLast < 100) {
+	  pause 5
+	}
+	do stand
+  }
+  timeout 15
+}
+
+automacro tutorial6_6_4 {
+  exclusive 1
+  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
+  CurrentSP < 24
+  InInventory "Stone" > 0
+  QuestActive 7485
+  CheckOnAI manual
+  call {
+    do sit
+	while ($.CurrentSPLast < 24) {
+	  pause 5
+	}
+	do stand
+  }
+  timeout 15
+}
+
+automacro tutorial6_7 {
+  exclusive 1
+  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
+  InInventory "Ninja Manual" == 0
+  QuestInactive 7484, 7485
+  ConfigKey debug_tutorial_step 6.6
+  CheckOnAI manual
+  run-once 1
+  call {
+    log [Tutorial] Get Ninja Manual
+	do conf debug_tutorial_step 6.7
+	do move 138 137
+	do talknpc 140 139 r0 r2 r3
+  }
+  timeout 15
+}
+
+automacro tutorial6_8 {
+  exclusive 1
+  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
+  InInventory "Acolyte Manual" == 0
+  ConfigKey debug_tutorial_step 6.7
+  CheckOnAI manual
+  run-once 1
+  call {
+    log [Tutorial] Get Acolyte Manual
+	do conf debug_tutorial_step 6.8
+    do move 150 163
+	do talknpc 152 165 r0
+  }
+  timeout 15
+}
+
+automacro tutorial6_9 {
+  exclusive 1
+  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
+  InInventory "Merchant Manual" == 0
+  ConfigKey debug_tutorial_step 6.8
+  CheckOnAI manual
+  run-once 1
+  call {
+    log [Tutorial] Get Merchant Manual
+    do debug_tutorial_step 6.9
+    do move 48 167
+    do talknpc 50 169 r1 r1
+    if ($.zeny < 100) {
+      if (&defined($map) == 0) {
+        $map = $.InMapRegexLast
+      }
+      $map = replace_string($map,"iz_ac02","izlude")
+      do move $map 121 170
+      do talknpc 124 165 s
+      do sell &inventory (Magnifier)
+      do sell done
+      $map = $.InMapRegexLast
+      do move $map 48 167
+    }
+    do talknpc 50 169
+    do talknpc 50 169
+  }
+  timeout 15
+}
+
+automacro tutorial6_9_1 {
+  exclusive 1
+  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
+  QuestActive 12304
+  ConfigKey debug_tutorial_step 6.9
+  CheckOnAI manual
+  run-once 1
+  call {
+    log [Tutorial] merchantology
+	do talknpc 53 171 r0 r0
+	do talknpc 50 169 r1
+	do talknpc 50 169 r0 r0
+	do talknpc 50 169 r1
+	do talknpc 50 169 r3
+  }
+  timeout 15
+}
+
+automacro tutorial7 {
+  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
+  IsNotEquippedID leftAccessory 2821, rightAccessory 2824
+  IsNotEquippedID leftAccessory 2820, rightAccessory 2819
+  IsNotEquippedID leftAccessory 2819, rightAccessory 2821
+  ConfigKey debug_tutorial_step 6.9
+  CheckOnAI manual
+  exclusive 1
+  run-once 1
+  priority 7
+  call {
+    do debug_tutorial_step 7
+    do eq topHead &inventory (Criatura Academy Hat [1])
+    do eq leftHand &inventory (Novice Guard)
+    do eq rightHand &inventory (Novice Main Gauche)
+    do eq robe &inventory (Somber Novice Hood)
+	do eq armor &inventory (Tattered Novice Ninja Suit)
+    do eq shoes &inventory (Novice Slippers)
+
+	$stats = &config (statsAddAuto_list)
+	if (&arg ("$stats", 2) == int) {
+	  do eq rightAccessory &inventory (Mage Manual)
+	  do eq leftAccessory &inventory (Acolyte Manual)
+	  @conf = (0,1,1)
+	} elsif (&arg ("$stats", 2) == str) {
+	  do eq rightAccessory &inventory (Swordman Manual)
+	  do eq leftAccessory &inventory (Thief Manual)
+	  @conf = (1,0,0)
+	} else {
+	  do eq rightAccessory &inventory (Acolyte Manual)
+	  do eq leftAccessory &inventory (Swordman Manual)
+	  @conf = (1,0,1)
+	}
+
+	if (!&config (attackSkillSlot_1) =~ /^.+$/) {
+	  add_key("attackSkillSlot_1", none)
+	  add_key("attackSkillSlot_1_lvl", none)
+	  add_key("attackSkillSlot_1_sp",none)
+	  add_key("attackSkillSlot_1_dist"," ")
+	  add_key("attackSkillSlot_1_stopWhenHit"," ")
+	  add_key("attackSkillSlot_1_monsters"," ")
+	  add_key("attackSkillSlot_1_whenEquipped"," ")
+	}
+	if (!&config (attackSkillSlot_0_whenEquipped) =~ /^.+$/) {
+      add_key("attackSkillSlot_0_whenEquipped"," ")
+	}
+	if (!&config (attackSkillSlot_1_whenEquipped) =~ /^.+$/) {
+      add_key("attackSkillSlot_1_whenEquipped"," ")
+	}
+	if (!&config (useSelf_skill_0_whenEquipped) =~ /^.+$/) {
+      add_key("useSelf_skill_0_whenEquipped"," ")
+	}
+	if ($conf[0] > 0) {
+	  do conf attackSkillSlot_0 SM_BASH
+	  do conf attackSkillSlot_0_lvl 1
+	  do conf attackSkillSlot_0_sp > 8
+	  do conf attackSkillSlot_0_dist 1
+	  do conf attackSkillSlot_0_whenEquipped Swordman Manual
+	}
+
+	if ($conf[1] > 0) {
+	  do conf attackSkillSlot_0 MG_FIREBOLT
+	  do conf attackSkillSlot_0_lvl 1
+	  do conf attackSkillSlot_0_sp > 12
+	  do conf attackSkillSlot_0_dist 10
+	  do conf attackSkillSlot_0_stopWhenHit 1
+	  do conf attackSkillSlot_0_monsters Fabre, Pupa
+	  do conf attackSkillSlot_0_whenEquipped Mage Manual
+	  do conf attackSkillSlot_1 MG_COLDBOLT
+	  do conf attackSkillSlot_1_lvl 1
+	  do conf attackSkillSlot_1_sp > 12
+	  do conf attackSkillSlot_1_dist 10
+	  do conf attackSkillSlot_1_stopWhenHit 1
+	  do conf attackSkillSlot_1_monsters Lunatic
+	  do conf attackSkillSlot_1_whenEquipped Mage Manual
+	}
+
+	if ($conf[2] > 0) {
+	  do conf useSelf_skill_0 AL_HEAL
+	  do conf useSelf_skill_0_lvl 1
+	  do conf useSelf_skill_0_sp > 13
+	  do conf useSelf_skill_0_hp < 20
+	  do conf useSelf_skill_0_whenEquipped Acolyte Manual
+	}
+
+	do conf useSelf_item_0 Novice Potion
+	do conf useSelf_item_0_hp < 10
+
+	if (&defined($map) == 0) {
+	  $map = $.InMapRegexLast
+    }
+	$map = replace_string($map,"2","1")
+	do move $map 122 28
+  }
+  timeout 15
+}
+
+#automacro set_skills {
+#  ConfigKeyNot attackSkillSlot_0 $skill0, attackSkillSlot_0_lvl $skill0_lvl, attackSkillSlot_0_sp $skill0_sp, attackSkillSlot_0_dist $skill0_dist, attackSkillSlot_0_stopWhenHit $skill0_stop, attackSkillSlot_0_monsters $skill0_monster, attackSkillSlot_0_whenEquipped $skill0_eq, attackSkillSlot_1 $skill1, attackSkillSlot_1_lvl $skill1_lvl, attackSkillSlot_1_sp $skill1_sp, attackSkillSlot_1_dist $skill1_dist, attackSkillSlot_1_stopWhenHit $skill1_stop, attackSkillSlot_1_monsters $skill1_monster, attackSkillSlot_1_whenEquipped $skill1_eq
+#  CheckOnAI manual
+#  exclusive 1
+#  priority 8
+#  call {
+#    if ($.ConfigKeyNotLastKeyValue == none) {
+#      add_key($.ConfigKeyNotLastKey, $.ConfigKeyNotLastWantedValue)
+#    } else {
+#      do conf $.ConfigKeyNotLastKey $.ConfigKeyNotLastWantedValue
+#    }
+#  }
+#}
+
+automacro tutorial7_1 {
+  exclusive 1
+  InMapRegex /^iz_ac01(_[a|b|c|d])?$/
+  ConfigKey debug_tutorial_step 7
+  CheckOnAI manual
+  run-once 1
+  call {
+    log [Tutorial] Learn about abnormal status
+	do conf debug_tutorial_step 7.1
+	do move 132 45
+    do talknpc 134 47 r1
+	do talknpc
+  }
+  timeout 15
+}
+
+automacro tutorial7_2 {
+  exclusive 1
+  InMapRegex /^iz_ac01(_[a|b|c|d])?$/
+  ConfigKey debug_tutorial_step 7.1
+  CheckOnAI manual
+  run-once 1
+  call {
+    log [Tutorial] Learn about attribute
+	do conf debug_tutorial_step 7.2
+	do move 55 72
+    do talknpc 53 74 r2
+  }
+  timeout 15
+}
+
+automacro tutorial7_2_1 {
+  InMapRegex /^iz_ac01(_[a|b|c|d])?$/
+  MobNear /Fire/
+  QuestActive 2299
+  ConfigKey debug_tutorial_step 7.2
+  CheckOnAI manual
+  run-once 1
+  call {
+	log [Tutorial] Attack egg
+	#do conf debug_tutorial_step 7.2.1
+	@pos = getPos($.MobNearLastPos,0,2)
+	do move $pos[0] $pos[1]
+	do conf tankMode 1
+	do a $.MobNearLastBinId
+  }
+  timeout 15
+}
+
+automacro tutorial7_2_2 {
+  exclusive 1
+  InMapRegex /^iz_ac01(_[a|b|c|d])?$/
+  QuestActive 2299
+  SimpleHookEvent damage
+  CheckOnAI manual
+  run-once 1
+  call {
+	log [Tutorial] Report damage
+	log damage is $.SimpleHookEventLastTarget
+	do talknpc 53 74 r2 r0 d$.SimpleHookEventLastTarget
+  }
+  timeout 15
+}
+
+automacro tutorial7_3 {
+  exclusive 1
+  InMapRegex /^iz_ac01(_[a|b|c|d])?$/
+  ConfigKey debug_tutorial_step 7.2
+  CheckOnAI manual
+  run-once 1
+  call {
+    log [Tutorial] Learn about pet
+	do conf debug_tutorial_step 7.3
+	do conf debug_tutorial_battle 1
+	do talknpc 45 80 r0 r0 r0 r0
+	do talknpc 45 80 r0
+	do talknpc 92 169
+	do talknpc 99 169 r0 r0 r0
+	do talknpc 99 169
+	#if (!&config (route_randomWalk) == 1) {
+    #  do conf route_randomWalk 1
+    #}
+	do ai on
+  }
+  timeout 15
+}
+
+automacro tutorial7_3_1 {
+  InMapRegex /^new_1-([1|2|3|4])?$/
+  MobNear /^Little/
+  InInventory "Little Unripe Apple" > 0
+  QuestActive 2296
+  ConfigKey debug_tutorial_step 7.3
+  run-once 1
+  call {
+	@pos = getPos($.MobNearLastPos,0,2)
+	do move $pos[0] $pos[1]
+	#do a $.MobNearLastBinId
+	log &invamount (Little Poring Egg)
+	while (&invamount (Little Poring Egg) == 0) {
+	  do im &inventory (Little Unripe Apple) $.MobNearLastBinId
+	  do pet capture $.MobNearLastBinId
+	  pause 0.5
+	}
+  }
+  timeout 15
+}
+
+#automacro tutorial7_3_2 {
+#  exclusive 1
+#  InMapRegex /^new_1-([1|2|3|4])?$/
+#  InInventory "Little Unripe Apple" == 0
+#  ConfigKey debug_tutorial_step 7.3
+#  call {
+#    do move 99 167
+#	do talknpc 99 169 r0
+#  }
+#  timeout 15
+#}
+
+automacro tutorial7_3_3 {
+  exclusive 1
+  InMapRegex /^new_1-([1|2|3|4])?$/
+  InInventory "Little Poring Egg" > 0
+  ConfigKey debug_tutorial_step 7.3
+  run-once 1
+  call {
+	do conf debug_tutorial_battle 0
+    do ai manual
+	do move 99 167
+	do talknpc 99 169 r0
+	do talknpc 92 169 r0
+	do talknpc 99 169 r0
+	do move iz_ac01 49 73
+  }
+  timeout 15
+}
+
+automacro tutorial7_4 {
+  exclusive 1
+  InMapRegex /^iz_ac01(_[a|b|c|d])?$/
+  ConfigKey debug_tutorial_step 7.3
+  CheckOnAI manual
+  run-once 1
+  call {
+    log [Tutorial] Learn about battle
+	do conf debug_tutorial_step 7.4
+	do conf debug_tutorial_battle 1
+	do talknpc 59 83 r0 r0 r0
+	do talknpc 59 83 r0 r1 r0
+	do talknpc 59 83 r0 r2 r0
+	do talknpc 59 83 r0 r3 r0
+	do talknpc 59 83 r1
+	do ai on
+  }
+  timeout 15
+}
+
+automacro tutorial7_4_1 {
+  exclusive 1
+  InMapRegex /^prt_fild08([a|b|c|d])?$/
+  QuestHuntOngoing 11339 1002
+  ConfigKey debug_tutorial_step 7.4
+  CheckOnAI manual
+  run-once 1
+  call {
+    $poring = 0
+    $setting = Poring
+    $attack = 1
+    $teleport = 0
+    $telesearch = 0
+	call tutorialHunt
+  }
+  timeout 15
+}
+
+automacro tutorial7_4_1_1 {
+  exclusive 1
+  InMapRegex /^prt_fild08([a|b|c|d])?$/
+  QuestHuntCompleted 11339 1002
+  InInventory "Jellopy" >= 5
+  ConfigKey debug_tutorial_step 7.4
+  run-once 1
+  call {
+    $poring = 1
+    #$setting = Poring
+    #$attack = 0
+    #$teleport = 0
+    #$telesearch = 0
+	#call tutorialHunt
+	if ($pupa > 0 && $fabre > 0 && $lunatic > 0 && $poring > 0) {
+	  do conf debug_tutorial_step 7.4.f
+	}
+  }
+  timeout 15
+}
+
+automacro tutorial7_4_2 {
+  exclusive 1
+  InMapRegex /^prt_fild08([a|b|c|d])?$/
+  QuestHuntOngoing 11340 1063
+  ConfigKey debug_tutorial_step 7.4
+  CheckOnAI manual
+  run-once 1
+  call {
+    $lunatic = 0
+	$setting = Lunatic
+    $attack = 1
+    $teleport = 0
+    $telesearch = 0
+	call tutorialHunt
+  }
+  timeout 15
+}
+
+automacro tutorial7_4_2_1 {
+  exclusive 1
+  InMapRegex /^prt_fild08([a|b|c|d])?$/
+  QuestHuntCompleted 11340 1063
+  InInventory "Carrot" >= 1
+  ConfigKey debug_tutorial_step 7.4
+  run-once 1
+  call {
+    $lunatic = 1
+    #$setting = Lunatic
+    #$attack = 0
+    #$teleport = 0
+    #$telesearch = 0
+	#call tutorialHunt
+	if ($pupa > 0 && $fabre > 0 && $lunatic > 0 && $poring > 0) {
+	  do conf debug_tutorial_step 7.4.f
+	}
+  }
+  timeout 15
+}
+
+automacro tutorial7_4_3 {
+  exclusive 1
+  InMapRegex /^prt_fild08([a|b|c|d])?$/
+  QuestHuntOngoing 11341 1007
+  ConfigKey debug_tutorial_step 7.4
+  CheckOnAI manual
+  run-once 1
+  call {
+    $fabre = 0
+    $setting = Fabre
+    $attack = 1
+    $teleport = 0
+    $telesearch = 0
+	call tutorialHunt
+  }
+  timeout 15
+}
+
+automacro tutorial7_4_3_1 {
+  exclusive 1
+  InMapRegex /^prt_fild08([a|b|c|d])?$/
+  QuestHuntCompleted 11341 1007
+  InInventory "Fluff" >= 3
+  ConfigKey debug_tutorial_step 7.4
+  run-once 1
+  call {
+    $fabre = 1
+    #$setting = Fabre
+    #$attack = 0
+    #$teleport = 0
+    #$telesearch = 0
+	#call tutorialHunt
+	if ($pupa > 0 && $fabre > 0 && $lunatic > 0 && $poring > 0) {
+	  do conf debug_tutorial_step 7.4.f
+	}
+  }
+  timeout 15
+}
+
+automacro tutorial7_4_4 {
+  exclusive 1
+  InMapRegex /^prt_fild08([a|b|c|d])?$/
+  QuestHuntOngoing 11344 1008
+  ConfigKey debug_tutorial_step 7.4
+  CheckOnAI manual
+  run-once 1
+  call {
+    $pupa = 0
+    $setting = Pupa
+    $attack = 1
+    $teleport = 0
+    $telesearch = 0
+	call tutorialHunt
+  }
+  timeout 15
+}
+
+automacro tutorial7_4_4_1 {
+  exclusive 1
+  InMapRegex /^prt_fild08([a|b|c|d])?$/
+  QuestHuntCompleted 11344 1008
+  InInventory "Shell" >= 2
+  ConfigKey debug_tutorial_step 7.4
+  run-once 1
+  call {
+    $pupa = 1
+    $setting = Pupa
+    $attack = 0
+    $teleport = 0
+    $telesearch = 0
+	call tutorialHunt
+	if ($pupa > 0 && $fabre > 0 && $lunatic > 0 && $poring > 0) {
+	  do conf debug_tutorial_step 7.4.f
+	}
+  }
+  timeout 15
+}
+
+#automacro tutorial7_4_5 {
+#  exclusive 1
+#  InMapRegex /^prt_fild08([a|b|c|d])?$/
+#  QuestActive 11341
+#  ConfigKey debug_tutorial_step 7.4
+#  run-once 1
+#  call {
+#    $setting = Pupa
+#    $attack = 1
+#    $teleport = 0
+#    $telesearch = 0
+#  }
+#  timeout 15
+#}
+
+automacro tutorial7_5 {
+  exclusive 1
+  InMapRegex /^prt_fild08([a|b|c|d])?$/
+  ConfigKey debug_tutorial_step 7.4.f
+  run-once 1
+  call {
+    log [Tutorial] Report quest progress
+    do conf debug_tutorial_step 7.5
+    do conf debug_tutorial_battle 0
+	do ai manual
+	$map = replace_string($.InMapRegexLast,"prt_fild08","iz_ac01_")
+	do move $map 61 81
+	do talknpc 59 83
+  }
+  timeout 15
+}
+
+macro tutorialHunt {
+  $param1 = &eval (defined Misc::mon_control("$setting")?Misc::mon_control("$setting")->{attack_auto}:"None")
+  $param2 = &eval (defined Misc::mon_control("$setting")?Misc::mon_control("$setting")->{teleport_auto}:"None")
+  $param3 = &eval (defined Misc::mon_control("$setting")?Misc::mon_control("$setting")->{teleport_search}:"None")
+
+
+  $match1 = $param1 == $attack
+  $match2 = $param2 == $teleport
+  $match3 = $param3 == $telesearch
+
+  if ( !match1 || !match2 !! !$match3) {
+    do eval Misc::mon_control("$setting")->{attack_auto} = $attack; Misc::mon_control("$setting")->{teleport_auto} = $teleport; Misc::mon_control("$setting")->{teleport_search} = $telesearch
+    rewrite($setting)
+    do reload mon_control
+  }
+}
+
+sub replace_string {
+  my ($string, $from, $to) = @_;
+  return $string if ($from eq "");
+  $string =~s/$from/$to/ig;
+  return $string;
+}
+
+sub getPos {
+  my ($loc, $dx, $dy) = @_;
+  my @pos = split ' ', $loc;
+  @pos[0] += $dx;
+  @pos[1] += $dy;
+  return @pos;
+}
+
+sub add_key {
+    my ($key, $value) = @_;
+    configModify($key, $value);
+}
+
+sub rewrite {
+  my ($name) = @_;
+  my $monster = Misc::mon_control("$name");
+  #my $monster = Misc::mon_control("$::Macro::Data::varStack{setting}");
+  my @lines = ();
+  if (open(FILE, "<:utf8", Settings::getControlFilename("mon_control.txt"))) {
+    while (<FILE>) {
+      s/\x{FEFF}//g; chomp;
+      if (/^#/ || /^\n/ || /^\r/) {
+		push @lines,$_;
+        next
+      }
+      /^(\d+|([a-zA-Z' ]+)*) -?\d/;
+	  message "line is $_ and \$1 is $1 and \$name is $name\n";
+      if ("$name" eq $1 && defined $monster) {
+      #if ("$::Macro::Data::varStack{setting}" eq $1 && defined $monster) {
+        $_ = $1;
+		s/\s+$//;
+		message "\$monster is $_ or $1 and \$name is $name\n";
+
+        push(@lines, ($_ . " $monster->{attack_auto} $monster->{teleport_auto} $monster->{teleport_search} $monster->{attack_lvl} $monster->{attack_jlvl} $monster->{attack_hp} $monster->{attack_sp} $monster->{weight}"));
+      } else {
+        push(@lines, $_);
+      }
+    }
+    close FILE
+  }
+  open(FILE, ">:utf8", Settings::getControlFilename("mon_control.txt"));
+  print FILE join "\n", @lines;
+  close FILE;
+}

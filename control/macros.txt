@@ -1,0 +1,82 @@
+#automacro tutorial {
+#	run-once 1
+#	call {
+#	  $step = 0;
+#	}
+#}
+#
+#automacro tutorial1 {
+#   location iz_int02
+#   run-once 1
+#   disabled 1
+#   call {
+#	   do ai manual
+#	   pause 1
+#       do move 52 30
+#	   do talk 1
+#	   pause 2
+#	   do move 56 15
+#	   do ai on
+#   }
+#   timeout 15
+#}
+#
+#automacro tutorial2 {
+#   location int_land02
+#   run-once 1
+#   disabled 1
+#   call {
+#       do ai manual
+#       pause 1
+#	   do talk @npc(78 103)
+#	   pause 1
+#	   do talk resp 0
+#	   pause 2
+#	   do ai on
+#   }
+#   timeout 15
+#}
+#
+#automacro tutorial3 {
+#   location int_land02
+#   inventory "Wood" >= 5
+#   run-once 1
+#   disabled 1
+#   call {
+#       do ai manual
+#	   pause 1
+#	   do move 61 71
+#	   do talk @npc(58 69)
+#	   pause 2
+#	   do move 78 100
+#	   do talk @npc(78 103)
+#	   pause 1
+#	   do talk @npc(73 100)
+#	   pause 1
+#	   do talk @npc(73 100)
+#	   pause 1
+#	   do talk resp 0
+#	   pause 1
+#	   do ai on
+#   }
+#   timeout 15
+#}
+#
+#automacro tutorial4 {
+#   location izlude
+#   weight < 1000
+#   var step 0
+#   run-once 1
+#   call {
+#	  log current step is $step
+#	  log $.pos
+#	  if ($.pos == 128 205) {
+#	  log position matches
+#	  }
+#       #do ai manual
+#	   #pause 1
+#	   #do move 128 205
+#	   #pause 
+#   }
+#   timeout 15
+#}

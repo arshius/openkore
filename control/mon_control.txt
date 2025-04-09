@@ -61,8 +61,13 @@
 ##### Eggs #####
 Ant's Egg 0 0 0
 PecoPeco's Egg 0 0 0
-Pupa 0 0 0
+Pupa 1 0 0     
 Thief Bug's Egg 0 0 0
+
+##### Tutorial #####
+Poring 1 0 0     
+Lunatic 1 0 0     
+Fabre 1 0 0
 
 ##### Alchemist Summons ####
 # Summoned Parasite

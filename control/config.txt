@@ -3,12 +3,12 @@
 
 ######## Login options and server-specific options ########
 
-master
-server
-username
-password
+master Localhost - rA/Herc 2021
+server 0
+username admin
+password 123456
 loginPinCode
-char
+char 1
 
 # Poseidon Settings: https://openkore.com/wiki/Poseidon
 # They must be the same as Query Server config in Poseidon.txt
@@ -27,17 +27,17 @@ XKore_injectDLL 1
 XKore_autoAttachIfOneExe 1
 XKore_silent 1
 XKore_bypassBotDetection 0
-XKore_exeName ragexe.exe
+XKore_exeName 2021-11-17_Ragexe_4thjob.exe
 
 # XKore 2 / Proxy configuration
 XKore_listenIp 127.0.0.1
-XKore_listenPort 6901
+XKore_listenPort 6900
 XKore_publicIp 127.0.0.1
 XKore_ID
 
 # It is not advised to set secureAdminPassword if you're using Xkore 2
 secureAdminPassword 1
-adminPassword
+adminPassword jecrofro
 callSign
 commandPrefix ;
 callSignGM 0
@@ -63,17 +63,17 @@ allowedMaps
 allowedMaps_reaction 1
 
 attackAuto 2
-attackAuto_party 1
+attackAuto_party 0
 attackAuto_onlyWhenSafe 0
-attackAuto_followTarget 1
-attackAuto_inLockOnly 1
-attackAuto_notInTown 1
+attackAuto_followTarget 0
+attackAuto_inLockOnly 0
+attackAuto_notInTown 0
 attackAuto_notWhile_storageAuto 1
 attackAuto_notWhile_buyAuto 1
 attackAuto_notWhile_sellAuto 1
 attackAuto_considerDamagedAggressive 0
-attackDistance 1
-attackDistanceAuto 1
+attackDistance 0
+attackDistanceAuto 0
 attackMaxDistance 1
 attackMaxRouteTime 4
 attackMinPlayerDistance 2
@@ -193,9 +193,9 @@ followLostStep 12
 followSitAuto 0
 followBot 0
 
-itemsTakeAuto 2
+itemsTakeAuto 1
 itemsTakeAuto_party 0
-itemsGatherAuto 2
+itemsGatherAuto 0
 itemsGatherAuto_notInTown 0
 itemsGatherAutoMinPlayerDistance 6
 itemsGatherAutoMinPortalDistance 5
@@ -215,7 +215,7 @@ lockMap_randY
 route_escape_reachedNoPortal 1
 route_escape_randomWalk 1
 route_escape_shout
-route_avoidWalls 1
+route_avoidWalls 0
 route_randomWalk 1
 route_randomWalk_inTown 0
 route_randomWalk_maxRouteTime 75
@@ -225,7 +225,7 @@ route_teleport 0
 route_teleport_minDistance 75
 route_teleport_maxTries 8
 route_teleport_notInMaps
-route_step 10
+route_step 15
 route_removeMissingPortals_NPC 1
 route_removeMissingPortals 0
 route_tryToGuessMissingPortalByDistance 1
@@ -268,12 +268,12 @@ sitAuto_look_from_wall
 sitTensionRelax 0
 
 statsAddAuto 0
-statsAddAuto_list
+statsAddAuto_list 20 int, 20 dex
 statsAddAuto_dontUseBonus 0
 statsAdd_over_99 1
 
-skillsAddAuto 0
-skillsAddAuto_list
+skillsAddAuto 1
+skillsAddAuto_list NV_BASIC 9
 
 tankMode 0
 tankModeTarget
@@ -312,7 +312,7 @@ teleportAuto_item2
 
 dealAuto 1
 dealAuto_names
-partyAuto 1
+partyAuto 2
 partyAutoShare 0
 partyAutoShareItem 0
 partyAutoShareItemDiv 0
@@ -332,11 +332,11 @@ showTime
 showTimeDomains
 showTimeDomainsFormat
 wx_map_maxAutoSize 300
-wx_map_monsterSticking 1
-wx_map_npcSticking 1
-wx_map_playersSticking 1
+wx_map_monsterSticking -1
+wx_map_npcSticking -1
+wx_map_playersSticking -1
 wx_map_portalSticking 5
-wx_map_route
+wx_map_route 1
 wx_npcTalk
 wx_captcha
 showAllDamage 0
@@ -544,14 +544,14 @@ pet_return 20
 # You can copy & paste any block multiple times. So if you want to
 # configure two attack skills, just duplicate the attackSkillSlot block.
 
-attackSkillSlot {
-	lvl
-	dist 1
-	maxDist 1
+attackSkillSlot MG_FIREBOLT {
+	lvl 1
+	dist 5
+	maxDist 5
 	maxCastTime 0
 	minCastTime 0
 	hp
-	sp > 10
+	sp > 12
 	ap
 	homunculus
 	homunculus_hp
@@ -581,12 +581,12 @@ attackSkillSlot {
 	amuletType
 	aggressives
 	previousDamage
-	stopWhenHit 0
+	stopWhenHit 1
 	inLockOnly 0
 	notInTown 0
 	timeout 0
 	disabled 0
-	monsters
+	monsters Fabre, Pupa
 	notMonsters
 	monstersCount
 	monstersCountDist
@@ -680,12 +680,12 @@ doCommand {
 	manualAI 0
 }
 
-useSelf_skill {
-	lvl
+useSelf_skill AL_HEAL {
+	lvl 1
 	maxCastTime 0
 	minCastTime 0
-	hp
-	sp
+	hp < 20
+	sp > 13
 	ap
 	homunculus
 	homunculus_hp
@@ -730,9 +730,98 @@ useSelf_skill {
 	manualAI 0
 }
 
+#useSelf_skill PR_MAGNIFICAT {
+#	lvl 5
+#	sp > 40
+#	whenStatusInactive EFST_MAGNIFICAT
+#}
+
+#useSelf_skill PR_GLORIA {
+#	lvl 5
+#	sp > 20
+#	whenStatusInactive EFST_GLORIA
+#}
+
+useSelf_skill PR_IMPOSITIO {
+	lvl 5
+	sp > 25
+	whenStatusInactive EFST_IMPOSITIO
+}
+
+useSelf_skill AL_ANGELUS {
+	lvl 10
+	sp > 50
+	whenStatusInactive EFST_ANGELUS
+}
+
+#useSelf_skill AL_BLESSING {
+#	lvl 10
+#	sp > 64
+#	whenStatusInactive EFST_BLESSING
+#}
+
+#useSelf_skill AL_INCAGI {
+#	lvl 10
+#	sp > 45
+#	whenStatusInactive EFST_INC_AGI
+#}
+
 useSelf_skill_smartHeal 1
 
 partySkillDistance 0..8
+
+partySkill AL_BLESSING {
+	lvl 10
+	sp > 64
+	notPartyOnly 1
+	target_whenStatusInactive EFST_BLESSING
+}
+
+partySkill AL_INCAGI {
+	lvl 10
+	maxDist 4
+	sp > 45
+	notPartyOnly 1
+	target_whenStatusInactive EFST_INC_AGI
+}
+
+partySkill AL_ANGELUS {
+	lvl 10
+	sp > 50
+	notPartyOnly 1
+	target_whenStatusInactive EFST_ANGELUS
+}
+
+partySkill PR_IMPOSITIO {
+	lvl 5
+	sp > 25
+	target_whenStatusInactive EFST_IMPOSITIO
+}
+
+partySkill AL_HEAL {
+	lvl 1
+	sp > 13
+	notPartyOnly 1
+	target_hp < 50%
+}
+
+#partySkill AL_HEAL {
+#	lvl 1
+#	sp > 13
+#	notPartyOnly 1
+#	target arsh15
+#	target_hp < 30
+#	timeout 5
+#}
+
+#partySkill AL_HEAL {
+#	lvl 1
+#	sp > 13
+#	notPartyOnly 1
+#	target arsh18
+#	target_hp < 30
+#	timeout 5
+#}
 
 partySkill {
 	lvl
@@ -884,8 +973,8 @@ equipAuto {
 	manualAI 0
 }
 
-useSelf_item {
-	hp
+useSelf_item Novice Potion {
+	hp < 10
 	sp
 	ap
 	homunculus
@@ -1000,3 +1089,7 @@ logToFile_Errors
 logToFile_Messages
 logToFile_Warnings
 history_max 50
+macro_orphans terminate
+
+debug_tutorial_step 5
+debug_tutorial_battle 0

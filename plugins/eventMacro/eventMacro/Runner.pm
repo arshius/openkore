@@ -1611,7 +1611,6 @@ sub parse_do {
 	my ($self, $do_command) = @_;
 	my $parsed_command = $self->parse_command($do_command);
 	return if (defined $self->error);
-
 	unless (defined $parsed_command) {
 		$self->error("Could not define do command");
 		return;

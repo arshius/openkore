@@ -3548,6 +3548,7 @@
 6003#Pendant of Spirit#
 6004#Cursed Baphomet Doll#
 6007#Freshly Boiled Octopus Rice Cake Soup#
+6008#Wood#
 6009#Big Fan Of Magic#
 6010#Hoe#
 6011#Blue Card B#
