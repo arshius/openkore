@@ -15,7 +15,7 @@ automacro wxsetting {
 }
 
 automacro initialize {
-  JobID 0
+  JobID 0, 4307
   CheckOnAI auto, manual
   exclusive 1
   run-once 1
@@ -35,19 +35,50 @@ automacro initialize {
 #      add_key("debug_tutorial_step","1")
 #      add_key("debug_tutorial_battle","-1")
 #    }
-
-#    lock tutorial_battle_on
-    lock tutorial_battle_off
-
-    do ai manual
+    call close_tutorial_battle
+	lock all
   }
   timeout 15
 }
 
-automacro tutorial_battle_on {
-  ConfigKeyNot route_step 15, skillsAddAuto 1, skillsAddAuto_list NV_BASIC 9, itemsTakeAuto 0, attackAuto -1, route_randomWalk  0, tankMode 1
+automacro initialize_configs {
+  ConfigKeyNot route_step 15, skillsAddAuto 1, skillsAddAuto_list NV_BASIC 9
   exclusive 1
   call set_config
+}
+
+automacro tutorial_battle_off {
+  ConfigKeyNot itemsTakeAuto 0, attackAuto -1, route_randomWalk  0, tankMode 1
+  exclusive 1
+  call set_config
+}
+
+automacro tutorial_battle_on {
+  ConfigKeyNot itemsTakeAuto 1, attackAuto 2, route_randomWalk 1, tankMode 0
+  exclusive 1
+  call set_config
+}
+
+macro set_config {
+  if ($.ConfigKeyNotLastKeyValue == none) {
+    add_key($.ConfigKeyNotLastKey, $.ConfigKeyNotLastWantedValue)
+  } else {
+    do conf $.ConfigKeyNotLastKey $.ConfigKeyNotLastWantedValue
+  }
+}
+
+macro do_tutorial_battle {
+  lock tutorial_battle_off
+  release tutorial_battle_on
+#  do conf debug_tutorial_battle 1
+  do ai on
+}
+
+macro close_tutorial_battle {
+  lock tutorial_battle_on
+  release tutorial_battle_off
+#  do conf debug_tutorial_battle 0
+  do ai manual
 }
 
 #automacro tutorial_battle_on {
@@ -63,17 +94,17 @@ automacro tutorial_battle_on {
 #  }
 #}
 
-automacro tutorial_battle_off {
-  ConfigKey debug_tutorial_battle 0
-  CheckOnAI auto, manual
-  exclusive 1
-  call {
-    while (@configs > 0) {
-	  do conf &shift(@configs) &shift(@configs)
-	  pause 1
-	}
-  }
-}
+#automacro tutorial_battle_off {
+#  ConfigKey debug_tutorial_battle 0
+#  CheckOnAI auto, manual
+#  exclusive 1
+#  call {
+#    while (@configs > 0) {
+#	  do conf &shift(@configs) &shift(@configs)
+#	  pause 1
+#	}
+#  }
+#}
 
 #automacro initialize_tutorial {
 #  ConfigKeyNot debug_tutorial_step 1, debug_tutorial_battle 0
@@ -81,27 +112,6 @@ automacro tutorial_battle_off {
 #  exclusive 1
 #  call set_config
 #}
-
-#automacro initialize_configs {
-#  ConfigKeyNot route_step 15, skillsAddAuto 1, skillsAddAuto_list NV_BASIC 9, itemsTakeAuto 0, attackAuto -1, route_randomWalk  0, tankMode 1
-#  exclusive 1
-#  call set_config
-#}
-
-macro set_config {
-  if ($.ConfigKeyNotLastKeyValue == none) {
-    add_key($.ConfigKeyNotLastKey, $.ConfigKeyNotLastWantedValue)
-  } else {
-    do conf $.ConfigKeyNotLastKey $.ConfigKeyNotLastWantedValue
-  }
-}
-
-macro do_tutorial_battle {
-  lock initialize_configs
-  release tutorial_battle_on
-  do conf debug_tutorial_battle 1
-  do ai on
-}
 
 automacro tutorial1 {
   InMapRegex /^iz_int(0[1|2|3|4])?$/
@@ -155,16 +165,16 @@ automacro tutorial3 {
   run-once 1
   call {
     log [Tutorial] Report to sailor to hand over Wood
-	do conf debug_tutorial_step 3
-	do conf debug_tutorial_battle 0
-	do ai manual
+	call close_tutorial_battle
+#    do conf debug_tutorial_step 3
+#    do conf debug_tutorial_battle 0
     do move 61 71
     do talknpc 58 69
     do move 78 100
     do talknpc 78 103
     do talknpc 73 100
     do talknpc 73 100 r0
-	do move izlude 196 209
+    do move 49 57
     do ai on
   }
   timeout 15
@@ -179,8 +189,8 @@ automacro tutorial4 {
   run-once 1
   call {
     log [Tutorial] Report to captain again in izlude
-	do conf debug_tutorial_step 4
-	do talknpc 198 213 r0
+#    do conf debug_tutorial_step 4
+    do talknpc 198 213 r0
   }
   timeout 15
 }
@@ -194,17 +204,19 @@ automacro tutorial5 {
   run-once 1
   call {
     log [Tutorial] Report to academy staff
-	do conf debug_tutorial_step 5
-	do move 128 205
-	do talknpc 122 207
-	do is &inventory (Apple Juice)
+#    do conf debug_tutorial_step 5
+    do move 128 205
+    do talknpc 122 207
+    do is &inventory (Apple Juice)
     do talknpc 122 207 r0
-	$map = replace_string($.InMapRegexLast,"izlude","iz_ac01")
-	do move $map 108 37
-	do talknpc 100 39 r0
-	$map = replace_string($map,"1","2")
-	do move $map 207 27
-	do ai manual
+#    $map = replace_string($.InMapRegexLast,"izlude","iz_ac01")
+	do move 125 257
+    do move 108 37
+    do talknpc 100 39 r0
+#    $map = replace_string($map,"1","2")
+#    do move $map 207 27
+    do move 122 25
+    do ai manual
   }
   timeout 15
 }
@@ -215,160 +227,159 @@ automacro tutorial6 {
   CheckOnAI manual
   run-once 1
   call {
-
+    if (&inventory (Swordman Manual) < 0) {
+	  call 6_1
+	  call 6_1a
+	}
+    if (&inventory (Taekwon Manual) < 0) {
+	  call 6_2
+	  call 6_2a
+	}
+    if (&inventory (Gunslinger Manual) < 0) {
+	  call 6_3
+	}
+    if (&inventory (Mage Manual) < 0) {
+	  call 6_4
+	  call 6_4a
+	}
+    if (&inventory (Archer Manual) < 0) {
+	  call 6_5
+	}
+    if (&inventory (Thief Manual) < 0) {
+	  call 6_6
+	  call 6_6a
+	}
+    if (&inventory (Ninja Manual) < 0) {
+	  call 6_7
+	}
+    if (&inventory (Acolyte Manual) < 0) {
+	  call 6_8
+	}
+    if (&inventory (Merchant Manual) < 0) {
+	  call 6_9
+	  call 6_9a
+	}
   }
+}
+
+macro 6_1 {
+  log [Tutorial] Get Swordman Manual
+#  do conf debug_tutorial_step 6.1
+  do move 64 49
+  do talknpc 60 51 r1
+}
+
+macro 6_1a {
+  log [Tutorial] Swordsman training
+  do move 64 49
+  do talknpc 60 51 r4
+  do talknpc 60 51
+  do eq leftAccessory &inventory (Swordman Manual) #Prepare for thief quest
+}
+
+macro 6_2 {
+  log [Tutorial] Get Taekwon Manual
+#  do conf debug_tutorial_step 6.2
+  do move 72 83
+  do talknpc 70 85 r0
+  do talknpc 70 85 r0 r1
+}
+
+macro 6_2a {
+  do eq &inventory (Taekwon Manual) #Prepare for thief quest
+}
+
+macro 6_3 {
+  log [Tutorial] Get Gunslinger Manual
+#  do conf debug_tutorial_step 6.3
+  do move 140 83
+  do talknpc 142 85 r1 r0
+}
+
+macro 6_4 {
+  log [Tutorial] Get Mage Manual
+#  do conf debug_tutorial_step 6.4
+  do move 146 112
+  do talknpc 148 110 r0 r3
+}
+
+macro 6_4a {
+  do eq rightAccessory &inventory (Mage Manual) #Prepare for thief quest
+}
+
+macro 6_5 {
+  log [Tutorial] Get Archer Manual
+#  do conf debug_tutorial_step 6.5
+  do move 67 107
+  do talknpc 65 109 r1 r1
+}
+
+macro 6_6 {
+  log [Tutorial] Get Thief Manual
+#  do conf debug_tutorial_step 6.6
+  do move 54 134
+  do talknpc 52 136 r0 r0
+  do talknpc 49 134 r0 r1
+  do talknpc 49 134 r1
+  do talknpc 55 134 r0 r4
+  do talknpc 52 136
+}
+
+macro 6_6a {
+  log [Tutorial] Use Thief manual
+  do talknpc 49 134
+  do talknpc 55 134 r0
+  do eq &inventory (Thief Manual)
+}
+
+macro 6_7 {
+  log [Tutorial] Get Ninja Manual
+#  do conf debug_tutorial_step 6.7
+  do move 138 137
+  do talknpc 140 139 r0 r2 r3
+}
+
+macro 6_8 {
+  log [Tutorial] Get Acolyte Manual
+#  do conf debug_tutorial_step 6.8
+  do move 150 163
+  do talknpc 152 165 r0
+}
+
+macro 6_9 {
+  log [Tutorial] Get Merchant Manual
+#  do debug_tutorial_step 6.9
+  do move 48 167
+  do talknpc 50 169 r1 r1
+  lock all
+#  if ($.zeny < 100) {
+#    $c_map = $.map
+#    $map = replace_string($.map,"iz_ac02","izlude")
+#    do move $map 121 170
+#    do talknpc 124 165 s
+#    do sell &inventory (Magnifier)
+#    do sell done
+#    do move $c_map 48 167
+#  }
+#  do talknpc 50 169
+#  do talknpc 50 169
+}
+
+macro 6_9a {
+  log [Tutorial] merchantology
+  do talknpc 53 171 r0 r0
+  do talknpc 50 169 r1
+  do talknpc 50 169 r0 r0
+  do talknpc 50 169 r1
+  do talknpc 50 169 r3
 }
 
 automacro tutorial6_1 {
-  exclusive 1
-  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
-  InInventory "Swordman Manual" == 0
-#  ConfigKey debug_tutorial_step 5
-  CheckOnAI manual
-  run-once 1
-  call {
-    log [Tutorial] Get Swordman Manual
-	do conf debug_tutorial_step 6.1
-	do move 64 49
-	do talknpc 60 51 r1
-  }
-  timeout 15
-}
-
-automacro tutorial6_1_1 {
-  exclusive 1
-  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
-  QuestActive 1229
-  CheckOnAI manual
-  run-once 1
-  call {
-	log [Tutorial] Swordsman training
-	do move 64 49
-	do talknpc 60 51 r4
-	do talknpc 60 51
-	do eq leftAccessory &inventory (Swordman Manual) #Prepare for thief quest
-  }
-  timeout 15
-}
-
-automacro tutorial6_2 {
-  exclusive 1
-  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
-  InInventory "Taekwon Manual" == 0
-#  ConfigKey debug_tutorial_step 6.1
-  CheckOnAI manual
-  run-once 1
-  call {
-    log [Tutorial] Get Taekwon Manual
-	do conf debug_tutorial_step 6.2
-	do move 72 83
-	do talknpc 70 85 r0
-	do talknpc 70 85 r0 r1
-  }
-  timeout 15
-}
-
-automacro tutorial6_3 {
-  exclusive 1
-  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
-  InInventory "Gunslinger Manual" == 0
-  ConfigKey debug_tutorial_step 6.2
-  CheckOnAI manual
-  run-once 1
-  call {
-    log [Tutorial] Get Gunslinger Manual
-	do conf debug_tutorial_step 6.3
-	do move 140 83
-	do talknpc 142 85 r1 r0
-  }
-  timeout 15
-}
-
-automacro tutorial6_4 {
-  exclusive 1
-  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
-  InInventory "Mage Manual" == 0
-  ConfigKey debug_tutorial_step 6.3
-  CheckOnAI manual
-  run-once 1
-  call {
-    log [Tutorial] Get Mage Manual
-	do conf debug_tutorial_step 6.4
-    do move 146 112
-	do talknpc 148 110 r0 r3
-  }
-  timeout 15
-}
-
-automacro tutorial6_4_1 {
-  exclusive 1
-  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
-  ConfigKey debug_tutorial_step 6.4
-  CheckOnAI manual
-  run-once 1
-  call {
-	do eq &inventory (Mage Manual) #Prepare for thief quest
-  }
-  timeout 15
-}
-
-automacro tutorial6_5 {
-  exclusive 1
-  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
-  InInventory "Archer Manual" == 0
-  ConfigKey debug_tutorial_step 6.4
-  CheckOnAI manual
-  run-once 1
-  call {
-    log [Tutorial] Get Archer Manual
-	do conf debug_tutorial_step 6.5
-	do move 67 107
-	do talknpc 65 109 r1 r1
-  }
-  timeout 15
-}
-
-automacro tutorial6_6 {
-  exclusive 1
-  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
-  InInventory "Thief Manual" == 0
-  ConfigKey debug_tutorial_step 6.5
-  CheckOnAI manual
-  run-once 1
-  call {
-    log [Tutorial] Get Thief Manual
-	do conf debug_tutorial_step 6.6
-	do move 54 134
-	do talknpc 52 136 r0 r0
-	do talknpc 49 134 r0 r1
-	do talknpc 49 134 r1
-	do talknpc 55 134 r0 r4
-	do talknpc 52 136
-  }
-  timeout 15
-}
-
-automacro tutorial6_6_1 {
-  exclusive 1
-  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
-  QuestActive 7483
-  CheckOnAI manual
-  run-once 1
-  call {
-    log [Tutorial] Use Thief manual
-	do talknpc 49 134
-	do talknpc 55 134 r0
-	do eq &inventory (Thief Manual)
-  }
-  timeout 15
-}
-
-automacro tutorial6_6_2 {
-  #exclusive 1
   InMapRegex /^iz_ac02(_[a|b|c|d])?$/
   MobNear /^Poring$/
   QuestActive 7484, 7485
   CheckOnAI manual
+  priority 2
   call {
     log [Tutorial] Steal from poring and kill it with envenom
 	@pos = getPos($.MobNearLastPos,0,-2)
@@ -380,6 +391,7 @@ automacro tutorial6_6_2 {
 	  do sm TF_STEAL $.MobNearLastBinId
 	  pause 1
 	}
+	lock tutorial6_2
 	#if ($.sp < 24) {
 	#  do sit
 	#  while ($.sp < 24) {
@@ -397,12 +409,14 @@ automacro tutorial6_6_2 {
   timeout 15
 }
 
-automacro tutorial6_6_3 {
-  exclusive 1
+automacro tutorial6_2 {
   InMapRegex /^iz_ac02(_[a|b|c|d])?$/
   CurrentSP < 10
+  InInventory "Stone" < 1
   QuestActive 7484
   CheckOnAI manual
+  exclusive 1
+  priority 1
   call {
     do sit
 	while ($.CurrentSPLast < 100) {
@@ -413,13 +427,15 @@ automacro tutorial6_6_3 {
   timeout 15
 }
 
-automacro tutorial6_6_4 {
-  exclusive 1
+automacro tutorial6_3 {
   InMapRegex /^iz_ac02(_[a|b|c|d])?$/
   CurrentSP < 24
   InInventory "Stone" > 0
   QuestActive 7485
   CheckOnAI manual
+  exclusive 1
+  run-once 1
+  priority 1
   call {
     do sit
 	while ($.CurrentSPLast < 24) {
@@ -430,203 +446,173 @@ automacro tutorial6_6_4 {
   timeout 15
 }
 
-automacro tutorial6_7 {
-  exclusive 1
-  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
-  InInventory "Ninja Manual" == 0
-  QuestInactive 7484, 7485
-  ConfigKey debug_tutorial_step 6.6
-  CheckOnAI manual
-  run-once 1
-  call {
-    log [Tutorial] Get Ninja Manual
-	do conf debug_tutorial_step 6.7
-	do move 138 137
-	do talknpc 140 139 r0 r2 r3
-  }
-  timeout 15
-}
-
-automacro tutorial6_8 {
-  exclusive 1
-  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
-  InInventory "Acolyte Manual" == 0
-  ConfigKey debug_tutorial_step 6.7
-  CheckOnAI manual
-  run-once 1
-  call {
-    log [Tutorial] Get Acolyte Manual
-	do conf debug_tutorial_step 6.8
-    do move 150 163
-	do talknpc 152 165 r0
-  }
-  timeout 15
-}
-
-automacro tutorial6_9 {
-  exclusive 1
-  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
-  InInventory "Merchant Manual" == 0
-  ConfigKey debug_tutorial_step 6.8
-  CheckOnAI manual
-  run-once 1
-  call {
-    log [Tutorial] Get Merchant Manual
-    do debug_tutorial_step 6.9
-    do move 48 167
-    do talknpc 50 169 r1 r1
-    if ($.zeny < 100) {
-      if (&defined($map) == 0) {
-        $map = $.InMapRegexLast
-      }
-      $map = replace_string($map,"iz_ac02","izlude")
-      do move $map 121 170
-      do talknpc 124 165 s
-      do sell &inventory (Magnifier)
-      do sell done
-      $map = $.InMapRegexLast
-      do move $map 48 167
-    }
-    do talknpc 50 169
-    do talknpc 50 169
-  }
-  timeout 15
-}
-
-automacro tutorial6_9_1 {
-  exclusive 1
-  InMapRegex /^iz_ac02(_[a|b|c|d])?$/
-  QuestActive 12304
-  ConfigKey debug_tutorial_step 6.9
-  CheckOnAI manual
-  run-once 1
-  call {
-    log [Tutorial] merchantology
-	do talknpc 53 171 r0 r0
-	do talknpc 50 169 r1
-	do talknpc 50 169 r0 r0
-	do talknpc 50 169 r1
-	do talknpc 50 169 r3
-  }
-  timeout 15
-}
-
 automacro tutorial7 {
   InMapRegex /^iz_ac02(_[a|b|c|d])?$/
   IsNotEquippedID leftAccessory 2821, rightAccessory 2824
   IsNotEquippedID leftAccessory 2820, rightAccessory 2819
   IsNotEquippedID leftAccessory 2819, rightAccessory 2821
-  ConfigKey debug_tutorial_step 6.9
+#  ConfigKey debug_tutorial_step 6.9
   CheckOnAI manual
   exclusive 1
   run-once 1
-  priority 7
+  priority 3
   call {
-    do debug_tutorial_step 7
+#    do debug_tutorial_step 7
     do eq topHead &inventory (Criatura Academy Hat [1])
     do eq leftHand &inventory (Novice Guard)
     do eq rightHand &inventory (Novice Main Gauche)
     do eq robe &inventory (Somber Novice Hood)
-	do eq armor &inventory (Tattered Novice Ninja Suit)
+    do eq armor &inventory (Tattered Novice Ninja Suit)
     do eq shoes &inventory (Novice Slippers)
 
-	$stats = &config (statsAddAuto_list)
-	if (&arg ("$stats", 2) == int) {
-	  do eq rightAccessory &inventory (Mage Manual)
-	  do eq leftAccessory &inventory (Acolyte Manual)
-	  @conf = (0,1,1)
-	} elsif (&arg ("$stats", 2) == str) {
-	  do eq rightAccessory &inventory (Swordman Manual)
-	  do eq leftAccessory &inventory (Thief Manual)
-	  @conf = (1,0,0)
-	} else {
-	  do eq rightAccessory &inventory (Acolyte Manual)
-	  do eq leftAccessory &inventory (Swordman Manual)
-	  @conf = (1,0,1)
-	}
-
-	if (!&config (attackSkillSlot_1) =~ /^.+$/) {
-	  add_key("attackSkillSlot_1", none)
-	  add_key("attackSkillSlot_1_lvl", none)
-	  add_key("attackSkillSlot_1_sp",none)
-	  add_key("attackSkillSlot_1_dist"," ")
-	  add_key("attackSkillSlot_1_stopWhenHit"," ")
-	  add_key("attackSkillSlot_1_monsters"," ")
-	  add_key("attackSkillSlot_1_whenEquipped"," ")
-	}
-	if (!&config (attackSkillSlot_0_whenEquipped) =~ /^.+$/) {
-      add_key("attackSkillSlot_0_whenEquipped"," ")
-	}
-	if (!&config (attackSkillSlot_1_whenEquipped) =~ /^.+$/) {
-      add_key("attackSkillSlot_1_whenEquipped"," ")
-	}
-	if (!&config (useSelf_skill_0_whenEquipped) =~ /^.+$/) {
-      add_key("useSelf_skill_0_whenEquipped"," ")
-	}
-	if ($conf[0] > 0) {
-	  do conf attackSkillSlot_0 SM_BASH
-	  do conf attackSkillSlot_0_lvl 1
-	  do conf attackSkillSlot_0_sp > 8
-	  do conf attackSkillSlot_0_dist 1
-	  do conf attackSkillSlot_0_whenEquipped Swordman Manual
-	}
-
-	if ($conf[1] > 0) {
-	  do conf attackSkillSlot_0 MG_FIREBOLT
-	  do conf attackSkillSlot_0_lvl 1
-	  do conf attackSkillSlot_0_sp > 12
-	  do conf attackSkillSlot_0_dist 10
-	  do conf attackSkillSlot_0_stopWhenHit 1
-	  do conf attackSkillSlot_0_monsters Fabre, Pupa
-	  do conf attackSkillSlot_0_whenEquipped Mage Manual
-	  do conf attackSkillSlot_1 MG_COLDBOLT
-	  do conf attackSkillSlot_1_lvl 1
-	  do conf attackSkillSlot_1_sp > 12
-	  do conf attackSkillSlot_1_dist 10
-	  do conf attackSkillSlot_1_stopWhenHit 1
-	  do conf attackSkillSlot_1_monsters Lunatic
-	  do conf attackSkillSlot_1_whenEquipped Mage Manual
-	}
-
-	if ($conf[2] > 0) {
-	  do conf useSelf_skill_0 AL_HEAL
-	  do conf useSelf_skill_0_lvl 1
-	  do conf useSelf_skill_0_sp > 13
-	  do conf useSelf_skill_0_hp < 20
-	  do conf useSelf_skill_0_whenEquipped Acolyte Manual
-	}
-
-	do conf useSelf_item_0 Novice Potion
-	do conf useSelf_item_0_hp < 10
-
-	if (&defined($map) == 0) {
-	  $map = $.InMapRegexLast
+    $stats = &config (statsAddAuto_list)
+    if (&arg ("$stats", 2) == int) {
+      do eq rightAccessory &inventory (Mage Manual)
+      do eq leftAccessory &inventory (Acolyte Manual)
+      @conf = (0,1,1)
+    } elsif (&arg ("$stats", 2) == str) {
+      do eq rightAccessory &inventory (Swordman Manual)
+      do eq leftAccessory &inventory (Thief Manual)
+      @conf = (1,0,0)
+    } else {
+      do eq rightAccessory &inventory (Acolyte Manual)
+      do eq leftAccessory &inventory (Swordman Manual)
+      @conf = (1,0,1)
     }
-	$map = replace_string($map,"2","1")
-	do move $map 122 28
+
+#    if (!&config (attackSkillSlot_1) =~ /^.+$/) {
+#      add_key("attackSkillSlot_1", none)
+#      add_key("attackSkillSlot_1_lvl", none)
+#      add_key("attackSkillSlot_1_sp",none)
+#      add_key("attackSkillSlot_1_dist"," ")
+#      add_key("attackSkillSlot_1_stopWhenHit"," ")
+#      add_key("attackSkillSlot_1_monsters"," ")
+#      add_key("attackSkillSlot_1_whenEquipped"," ")
+#    }
+#    if (!&config (attackSkillSlot_0_whenEquipped) =~ /^.+$/) {
+#          add_key("attackSkillSlot_0_whenEquipped"," ")
+#    }
+#    if (!&config (attackSkillSlot_1_whenEquipped) =~ /^.+$/) {
+#          add_key("attackSkillSlot_1_whenEquipped"," ")
+#    }
+#    if (!&config (useSelf_skill_0_whenEquipped) =~ /^.+$/) {
+#          add_key("useSelf_skill_0_whenEquipped"," ")
+#    }
+#    if ($conf[0] > 0) {
+#      do conf attackSkillSlot_0 SM_BASH
+#      do conf attackSkillSlot_0_lvl 1
+#      do conf attackSkillSlot_0_sp > 8
+#      do conf attackSkillSlot_0_dist 1
+#      do conf attackSkillSlot_0_whenEquipped Swordman Manual
+#    }
+#
+#    if ($conf[1] > 0) {
+#      do conf attackSkillSlot_0 MG_FIREBOLT
+#      do conf attackSkillSlot_0_lvl 1
+#      do conf attackSkillSlot_0_sp > 12
+#      do conf attackSkillSlot_0_dist 10
+#      do conf attackSkillSlot_0_stopWhenHit 1
+#      do conf attackSkillSlot_0_monsters Fabre, Pupa
+#      do conf attackSkillSlot_0_whenEquipped Mage Manual
+#      do conf attackSkillSlot_1 MG_COLDBOLT
+#      do conf attackSkillSlot_1_lvl 1
+#      do conf attackSkillSlot_1_sp > 12
+#      do conf attackSkillSlot_1_dist 10
+#      do conf attackSkillSlot_1_stopWhenHit 1
+#      do conf attackSkillSlot_1_monsters Lunatic
+#      do conf attackSkillSlot_1_whenEquipped Mage Manual
+#    }
+#
+#    if ($conf[2] > 0) {
+#      do conf useSelf_skill_0 AL_HEAL
+#      do conf useSelf_skill_0_lvl 1
+#      do conf useSelf_skill_0_sp > 13
+#      do conf useSelf_skill_0_hp < 20
+#      do conf useSelf_skill_0_whenEquipped Acolyte Manual
+#    }
+#
+#    do conf useSelf_item_0 Novice Potion
+#    do conf useSelf_item_0_hp < 10
+#
+    if (&defined($map) == 0) {
+      $map = $.InMapRegexLast
+        }
+    $map = replace_string($map,"2","1")
+    do move $map 122 28
   }
   timeout 15
 }
 
-#automacro set_skills {
-#  ConfigKeyNot attackSkillSlot_0 $skill0, attackSkillSlot_0_lvl $skill0_lvl, attackSkillSlot_0_sp $skill0_sp, attackSkillSlot_0_dist $skill0_dist, attackSkillSlot_0_stopWhenHit $skill0_stop, attackSkillSlot_0_monsters $skill0_monster, attackSkillSlot_0_whenEquipped $skill0_eq, attackSkillSlot_1 $skill1, attackSkillSlot_1_lvl $skill1_lvl, attackSkillSlot_1_sp $skill1_sp, attackSkillSlot_1_dist $skill1_dist, attackSkillSlot_1_stopWhenHit $skill1_stop, attackSkillSlot_1_monsters $skill1_monster, attackSkillSlot_1_whenEquipped $skill1_eq
-#  CheckOnAI manual
-#  exclusive 1
-#  priority 8
-#  call {
-#    if ($.ConfigKeyNotLastKeyValue == none) {
-#      add_key($.ConfigKeyNotLastKey, $.ConfigKeyNotLastWantedValue)
-#    } else {
-#      do conf $.ConfigKeyNotLastKey $.ConfigKeyNotLastWantedValue
-#    }
-#  }
-#}
+macro set_skills {
+  if ($conf[0] > 0) {
+    $s0 = SM_BASH
+	$s0_lvl = 1
+	$s0_sp = > 8
+	$s0_dist = 1
+	$s0_w_hit = 0
+	$s0_mon = none
+	$s0_w_eq = Swordman Manual
+  }
+
+  if ($conf[1] > 0) {
+    $s0 = MG_FIREBOLT
+	$s0_lvl = 1
+	$s0_sp = > 12
+	$s0_dist = 5
+	$s0_w_hit = 1
+	$s0_mon = Fabre, Pupa
+	$s0_w_eq = Mage Manual
+
+    $s1 = MG_COLDBOLT
+	$s1_lvl = 1
+	$s1_sp = > 12
+	$s1_dist = 5
+	$s1_w_hit = 1
+	$s1_mon = Lunatic
+	$s1_w_eq = Mage Manual
+  }
+
+  if ($conf[2] > 0) {
+    $os0 = AL_HEAL
+	$os0_lvl = 1
+	$os0_sp = > 13
+	$os0_hp = < 10
+	$os0_w_eq = Acolyte Manual
+  }
+
+  $i0 = Novice Potion
+  $i0_hp = < 10
+}
+
+automacro set_attack0 {
+  ConfigKeyNot attackSkillSlot_0 $s0, attackSkillSlot_0_lvl $s0_lvl, attackSkillSlot_0_sp $s0_sp, attackSkillSlot_0_dist $s0_dist, attackSkillSlot_0_stopWhenHit $s0_w_hit, attackSkillSlot_0_monsters $s0_mon, attackSkillSlot_0_whenEquipped $s0_w_eq
+  CheckOnAI manual
+  exclusive 1
+  priority 4
+  call set_config
+}
+
+automacro set_attack1 {
+  ConfigKeyNot attackSkillSlot_1 $s1, attackSkillSlot_1_lvl $s1_lvl, attackSkillSlot_1_sp $s1_sp, attackSkillSlot_1_dist $s1_dist, attackSkillSlot_1_stopWhenHit $s1_w_hit, attackSkillSlot_1_monsters $s1_mon, attackSkillSlot_1_whenEquipped $s1_w_eq
+  CheckOnAI manual
+  exclusive 1
+  priority 4
+  call set_config
+}
+
+automacro set_recovery0 {
+  ConfigKeyNot useSelf_skill_0 $os0, useSelf_skill_0_lvl $os0_lvl, useSelf_skill_0_sp $os0_sp, useSelf_skill_0_hp $os0_hp, useSelf_skill_0_whenEquipped $os0_w_eq, useSelf_item_0 $i0, useSelf_item_0_hp $i0_hp
+  CheckOnAI manual
+  exclusive 1
+  priority 4
+  call set_config
+}
 
 automacro tutorial7_1 {
-  exclusive 1
   InMapRegex /^iz_ac01(_[a|b|c|d])?$/
   ConfigKey debug_tutorial_step 7
   CheckOnAI manual
+  exclusive 1
   run-once 1
   call {
     log [Tutorial] Learn about abnormal status
