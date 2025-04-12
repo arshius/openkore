@@ -124,6 +124,64 @@ iz_ac02 198 27 iz_ac01 78 28
 iz_ac02 217 27 iz_ac01 122 28
 new_1-3 96 176 iz_ac01 49 73
 
+# Izlude Academy Kafra Services
+iz_ac01 95 46 iz_ac01 97 86 0 c c c r2 c c c r1 r0
+iz_ac01 95 46 iz_ac02 207 115 0 c c c r2 c c c r1 r1
+iz_ac01 95 46 izlude 128 98 0 c c c r2 c c c r1 r2 c r1
+iz_ac01_a 95 46 iz_ac01_a 97 86 0 c c c r2 c c c r1 r0
+iz_ac01_a 95 46 iz_ac02_a 207 115 0 c c c r2 c c c r1 r1
+iz_ac01_a 95 46 izlude_a 128 98 0 c c c r2 c c c r1 r2 c r1
+iz_ac01_b 95 46 iz_ac01_b 97 86 0 c c c r2 c c c r1 r0
+iz_ac01_b 95 46 iz_ac02_b 207 115 0 c c c r2 c c c r1 r1
+iz_ac01_b 95 46 izlude_b 128 98 0 c c c r2 c c c r1 r2 c r1
+iz_ac01_c 95 46 iz_ac01_c 97 86 0 c c c r2 c c c r1 r0
+iz_ac01_c 95 46 iz_ac02_c 207 115 0 c c c r2 c c c r1 r1
+iz_ac01_c 95 46 izlude_c 128 98 0 c c c r2 c c c r1 r2 c r1
+iz_ac01_d 95 46 iz_ac01_d 97 86 0 c c c r2 c c c r1 r0
+iz_ac01_d 95 46 iz_ac02_d 207 115 0 c c c r2 c c c r1 r1
+iz_ac01_d 95 46 izlude_d 128 98 0 c c c r2 c c c r1 r2 c r1
+
+iz_ac01 89 103 iz_ac01 97 86 0 c c c r2 c c c r1 r0
+iz_ac01 89 103 iz_ac02 207 115 0 c c c r2 c c c r1 r1
+iz_ac01 89 103 izlude 128 98 0 c c c r2 c c c r1 r2 c r1
+iz_ac01_a 89 103 iz_ac01_a 97 86 0 c c c r2 c c c r1 r0
+iz_ac01_a 89 103 iz_ac02_a 207 115 0 c c c r2 c c c r1 r1
+iz_ac01_a 89 103 izlude_a 128 98 0 c c c r2 c c c r1 r2 c r1
+iz_ac01_b 89 103 iz_ac01_b 97 86 0 c c c r2 c c c r1 r0
+iz_ac01_b 89 103 iz_ac02_b 207 115 0 c c c r2 c c c r1 r1
+iz_ac01_b 89 103 izlude_b 128 98 0 c c c r2 c c c r1 r2 c r1
+iz_ac01_c 89 103 iz_ac01_c 97 86 0 c c c r2 c c c r1 r0
+iz_ac01_c 89 103 iz_ac02_c 207 115 0 c c c r2 c c c r1 r1
+iz_ac01_c 89 103 izlude_c 128 98 0 c c c r2 c c c r1 r2 c r1
+iz_ac01_d 89 103 iz_ac01_d 97 86 0 c c c r2 c c c r1 r0
+iz_ac01_d 89 103 iz_ac02_d 207 115 0 c c c r2 c c c r1 r1
+iz_ac01_d 89 103 izlude_d 128 98 0 c c c r2 c c c r1 r2 c r1
+
+iz_ac02 204 115 iz_ac01 97 86 0 c c c r2 c c c r1 r0
+iz_ac02 204 115 izlude 128 98 0 c c c r2 c c c r1 r2 c r1
+iz_ac02_a 204 115 iz_ac01_a 97 86 0 c c c r2 c c c r1 r0
+iz_ac02_a 204 115 izlude_a 128 98 0 c c c r2 c c c r1 r2 c r1
+iz_ac02_b 204 115 iz_ac01_b 97 86 0 c c c r2 c c c r1 r0
+iz_ac02_b 204 115 izlude_b 128 98 0 c c c r2 c c c r1 r2 c r1
+iz_ac02_c 204 115 iz_ac01_c 97 86 0 c c c r2 c c c r1 r0
+iz_ac02_c 204 115 izlude_c 128 98 0 c c c r2 c c c r1 r2 c r1
+iz_ac02_d 204 115 iz_ac01_d 97 86 0 c c c r2 c c c r1 r0
+iz_ac02_d 204 115 izlude_d 128 98 0 c c c r2 c c c r1 r2 c r1
+
+# Izlude Academy Garden
+iz_ac01 45 80 new_1-3 95 171 0 c r0 c
+iz_ac01_a 45 80 new_1-3 95 171 0 c r0 c
+iz_ac01_b 45 80 new_1-3 95 171 0 c r0 c
+iz_ac01_c 45 80 new_1-3 95 171 0 c r0 c
+iz_ac01_d 45 80 new_1-3 95 171 0 c r0 c
+
+# Izlude Academy Battle Instructor
+iz_ac01 59 83 prt_fild08 344 213 0 c r1
+iz_ac01_a 59 83 prt_fild08a 344 213 0 c r1
+iz_ac01_b 59 83 prt_fild08b 344 213 0 c r1
+iz_ac01_c 59 83 prt_fild08c 344 213 0 c r1
+iz_ac01_d 59 83 prt_fild08d 344 213 0 c r1
+
 # Izlude Academy Duplicates
 izlude_a 125 257 iz_ac01_a 99 29
 izlude_b 125 257 iz_ac01_b 99 29
