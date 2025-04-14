@@ -26,7 +26,7 @@ automacro initialize {
 }
 
 automacro initialize_configs {
-  ConfigKeyNot route_step 15, skillsAddAuto 1, skillsAddAuto_list NV_BASIC 9, statsAddAuto 1, sitAuto_hp_lower 20
+  ConfigKeyNot route_step 15, skillsAddAuto 1, skillsAddAuto_list NV_BASIC 9, statsAddAuto 1, statsAddAuto_dontUseBonus 1, sitAuto_hp_lower 20
   CheckOnAI auto, manual
   exclusive 1
   priority 1
@@ -178,7 +178,6 @@ automacro tutorial6 {
     }
     if (&inventory (Taekwon Manual) < 0) {
       call 6_2
-      call 6_2a
     }
     if (&inventory (Gunslinger Manual) < 0) {
       call 6_3
@@ -218,7 +217,6 @@ macro 6_1a {
   do move 64 49
   do talknpc 60 51 r4
   do talknpc 60 51
-  do eq &inventory (Swordman Manual) #Prepare for thief quest
 }
 
 macro 6_2 {
@@ -226,10 +224,6 @@ macro 6_2 {
   do move 72 83
   do talknpc 70 85 r0
   do talknpc 70 85 r0 r1 r3
-}
-
-macro 6_2a {
-  do eq &inventory (Taekwon Manual) #Prepare for thief quest
 }
 
 macro 6_3 {
@@ -245,7 +239,7 @@ macro 6_4 {
 }
 
 macro 6_4a {
-  do eq rightAccessory &inventory (Mage Manual) #Prepare for thief quest
+  do eq &inventory (Mage Manual) #Prepare for thief quest
 }
 
 macro 6_5 {
@@ -358,8 +352,8 @@ automacro tutorial6_3 {
     }
     lock tutorial6_4
     do sm TF_POISON $.MobNearLastBinId
-    pause 1
-    do sm TF_POISON $.MobNearLastBinId
+#    pause 1
+#    do sm TF_POISON $.MobNearLastBinId
     do talknpc 49 134
     do talknpc 55 134
     do talknpc 52 136
@@ -405,14 +399,18 @@ automacro tutorial7 {
   run-once 1
   priority 2
   call {
+    log [Tutorial] prepare stats and skills for next step
     $stats = &config (statsAddAuto_list)
     if (&arg ("$stats", 2) == int) {
       @conf = (0,1,1)
 #    } elsif (&arg ("$stats", 2) == str) {
 #      @conf = (1,0,0)
-    } else0{
+    } else {
       @conf = (1,0,0)
     }
+
+    log $conf[0] , $conf[1], $conf[2]
+
     call set_eq
     call set_skills
     release tutorial7_1
@@ -441,7 +439,7 @@ macro set_eq {
 }
 
 automacro set_equip {
-  InMapRegex /^iz_ac0([1-2]_[a-d])?$/
+  InMapRegex /^iz_ac0[12](_[a-d])?$/
   IsNotEquippedID topHead $head, leftHand $off, rightHand $main, robe $robe, armor $body, shoes $foot, leftAccessory $acc1, rightAccessory $acc2
   CheckOnAI manual
   exclusive 1
@@ -526,7 +524,7 @@ macro set_skills {
 }
 
 automacro set_attack0 {
-  InMapRegex /^iz_ac0([1-2]_[a-d])?$/
+  InMapRegex /^iz_ac0[12](_[a-d])?$/
   ConfigKeyNot attackSkillSlot_0 $s0, attackSkillSlot_0_lvl $s0_lvl, attackSkillSlot_0_sp $s0_sp, attackSkillSlot_0_dist $s0_dist, attackSkillSlot_0_stopWhenHit $s0_w_hit, attackSkillSlot_0_monsters $s0_mon, attackSkillSlot_0_whenEquipped $s0_w_eq
   CheckOnAI manual
   exclusive 1
@@ -534,7 +532,7 @@ automacro set_attack0 {
 }
 
 automacro set_attack1 {
-  InMapRegex /^iz_ac0([1-2]_[a-d])?$/
+  InMapRegex /^iz_ac0[12](_[a-d])?$/
   ConfigKeyNot attackSkillSlot_1 $s1, attackSkillSlot_1_lvl $s1_lvl, attackSkillSlot_1_sp $s1_sp, attackSkillSlot_1_dist $s1_dist, attackSkillSlot_1_stopWhenHit $s1_w_hit, attackSkillSlot_1_monsters $s1_mon, attackSkillSlot_1_whenEquipped $s1_w_eq
   CheckOnAI manual
   exclusive 1
@@ -542,11 +540,10 @@ automacro set_attack1 {
 }
 
 automacro set_recovery0 {
-  InMapRegex /^iz_ac0([1-2]_[a-d])?$/
+  InMapRegex /^iz_ac0[12](_[a-d])?$/
   ConfigKeyNot useSelf_skill_0 $os0, useSelf_skill_0_lvl $os0_lvl, useSelf_skill_0_sp $os0_sp, useSelf_skill_0_hp $os0_hp, useSelf_skill_0_whenEquipped $os0_w_eq, useSelf_item_0 $i0, useSelf_item_0_hp $i0_hp
   CheckOnAI manual
   exclusive 1
-  priority 4
   call set_config
 }
 
