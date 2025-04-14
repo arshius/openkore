@@ -409,7 +409,7 @@ automacro tutorial7 {
       @conf = (1,0,0)
     }
 
-    log $conf[0] , $conf[1], $conf[2]
+#    log $conf[0] , $conf[1], $conf[2]
 
     call set_eq
     call set_skills
@@ -421,10 +421,10 @@ automacro tutorial7 {
 macro set_eq {
   $head = 18730 #topHead
   $off  = 2112  #leftHand
-  $main   = 1243  #rightHand
-  $robe   = 2510  #robe
-  $body  = 2352  #armor
-  $foot  = 2414  #shoes
+  $main = 1243  #rightHand
+  $rob  = 2510  #robe
+  $body = 2352  #armor
+  $foot = 2414  #shoes
   if ($conf[0] > 0) {
     $acc2 = 2819
   }
@@ -441,41 +441,33 @@ macro set_eq {
 automacro set_equip {
   InMapRegex /^iz_ac0[12](_[a-d])?$/
   IsNotEquippedID topHead $head, leftHand $off, rightHand $main, robe $robe, armor $body, shoes $foot, leftAccessory $acc1, rightAccessory $acc2
-  CheckOnAI manual
+  CheckOnAI auto, manual
   exclusive 1
   call {
    log equiping $.IsNotEquippedIDLastSlot
      switch ($.IsNotEquippedIDLastSlot) {
       case (== topHead) {
-        log equip topHead with $head > &inventory ($head)
         do eq topHead &inventory ($head)
       }
       case (== leftHand) {
-        log equip leftHand with $off > &inventory ($off)
         do eq leftHand &inventory ($off)
       }
       case (== rightHand) {
-        log equip rightHand with $main > &inventory ($main)
         do eq rightHand &inventory ($main)
       }
       case (== robe) {
-        log equip robe with $robe > &inventory ($robe)
         do eq robe &inventory ($robe)
       }
       case (== armor) {
-        log equip armor with $body > &inventory ($body)
         do eq armor &inventory ($body)
       }
       case (== shoes) {
-        log equip shoes with $foot > &inventory ($foot)
         do eq shoes &inventory ($foot)
       }
       case (== leftAccessory) {
-        log equip leftAccessory with $acc1 > &inventory ($acc1)
         do eq leftAccessory &inventory ($acc1)
       }
       case (== rightAccessory) {
-        log equip rightAccessory with $acc2 > &inventory ($acc2)
         do eq rightAccessory &inventory ($acc2)
       }
     }
@@ -745,7 +737,7 @@ automacro tutorial8_7 {
     call do_tutorial_battle
     do move 59 80
     do talknpc 59 83 r1
-    lock tutorial8_12
+    #lock tutorial8_12
   }
   timeout 15
 }
@@ -775,11 +767,11 @@ automacro tutorial8_8a {
   run-once 1
   call {
     $poring = 1
-    #$setting = Poring
-    #$attack = 0
-    #$teleport = 0
-    #$telesearch = 0
-    #call tutorialHunt
+    $setting = Poring
+    $attack = 0
+    $teleport = 0
+    $telesearch = 0
+    call tutorialHunt
   }
   timeout 15
 }
@@ -809,11 +801,11 @@ automacro tutorial8_9a {
   run-once 1
   call {
     $lunatic = 1
-    #$setting = Lunatic
-    #$attack = 0
-    #$teleport = 0
-    #$telesearch = 0
-    #call tutorialHunt
+    $setting = Lunatic
+    $attack = 0
+    $teleport = 0
+    $telesearch = 0
+    call tutorialHunt
   }
   timeout 15
 }
@@ -843,11 +835,11 @@ automacro tutorial8_10a {
   run-once 1
   call {
     $fabre = 1
-    #$setting = Fabre
-    #$attack = 0
-    #$teleport = 0
-    #$telesearch = 0
-    #call tutorialHunt
+    $setting = Fabre
+    $attack = 0
+    $teleport = 0
+    $telesearch = 0
+    call tutorialHunt
   }
   timeout 15
 }
@@ -907,18 +899,23 @@ automacro tutorial8_12 {
 
 macro tutorialHunt {
   $param1 = &eval (defined Misc::mon_control("$setting")?Misc::mon_control("$setting")->{attack_auto}:"None")
-  $param2 = &eval (defined Misc::mon_control("$setting")?Misc::mon_control("$setting")->{teleport_auto}:"None")
-  $param3 = &eval (defined Misc::mon_control("$setting")?Misc::mon_control("$setting")->{teleport_search}:"None")
+  #$param2 = &eval (defined Misc::mon_control("$setting")?Misc::mon_control("$setting")->{teleport_auto}:"None")
+  #$param3 = &eval (defined Misc::mon_control("$setting")?Misc::mon_control("$setting")->{teleport_search}:"None")
 
+  log $setting is $param1
+  if ($param1 eq "None") {
+    rewrite($setting, append, $attack, $teleport, $telesearch)
+	do reload mon_control
+  } else {
+    $match1 = $param1 == $attack
+    $match2 = $param2 == $teleport
+    $match3 = $param3 == $telesearch
 
-  $match1 = $param1 == $attack
-  $match2 = $param2 == $teleport
-  $match3 = $param3 == $telesearch
-
-  if ( !match1 || !match2 !! !$match3) {
-    do eval Misc::mon_control("$setting")->{attack_auto} = $attack; Misc::mon_control("$setting")->{teleport_auto} = $teleport; Misc::mon_control("$setting")->{teleport_search} = $telesearch
-    rewrite($setting)
-    do reload mon_control
+    if ( !match1 || !match2 !! !$match3) {
+      do eval Misc::mon_control("$setting")->{attack_auto} = $attack; Misc::mon_control("$setting")->{teleport_auto} = $teleport; Misc::mon_control("$setting")->{teleport_search} = $telesearch
+      rewrite($setting)
+      do reload mon_control
+    }
   }
 }
 
@@ -953,28 +950,36 @@ sub add_key {
 }
 
 sub rewrite {
-  my ($name) = @_;
-  my $monster = Misc::mon_control("$name");
-  my @lines = ();
-  if (open(FILE, "<:utf8", Settings::getControlFilename("mon_control.txt"))) {
-    while (<FILE>) {
-      s/\x{FEFF}//g; chomp;
-      if (/^#/ || /^\n/ || /^\r/) {
-        push @lines,$_;
-        next
+  my ($name, $append, $arg1, $arg2, $arg3) = @_;
+
+  if ($append eq "") {
+    my $monster = Misc::mon_control("$name");
+    my @lines = ();
+
+    if (open(FILE, "<:utf8", Settings::getControlFilename("mon_control.txt"))) {
+      while (<FILE>) {
+        s/\x{FEFF}//g; chomp;
+        if (/^#/ || /^\n/ || /^\r/) {
+          push @lines,$_;
+          next
+        }
+        /^(\d+|([a-zA-Z' ]+)*) -?\d/;
+        if ("$name" eq $1 && defined $monster) {
+          $_ = $1;
+          s/\s+$//;
+          push(@lines, ($_ . " $monster->{attack_auto} $monster->{teleport_auto} $monster->{teleport_search} $monster->{attack_lvl} $monster->{attack_jlvl} $monster->{attack_hp} $monster->{attack_sp} $monster->{weight}"));
+        } else {
+          push(@lines, $_);
+        }
       }
-      /^(\d+|([a-zA-Z' ]+)*) -?\d/;
-      if ("$name" eq $1 && defined $monster) {
-        $_ = $1;
-        s/\s+$//;
-        push(@lines, ($_ . " $monster->{attack_auto} $monster->{teleport_auto} $monster->{teleport_search} $monster->{attack_lvl} $monster->{attack_jlvl} $monster->{attack_hp} $monster->{attack_sp} $monster->{weight}"));
-      } else {
-        push(@lines, $_);
-      }
+      close FILE
     }
-    close FILE
+    open(FILE, ">:utf8", Settings::getControlFilename("mon_control.txt"));
+    print FILE join "\n", @lines;
+    close FILE;
+  } else {
+    open(FILE, ">>:utf8", Settings::getControlFilename("mon_control.txt"));
+	print FILE $name . " $arg1 $arg2 $arg3\n";
+	close FILE;
   }
-  open(FILE, ">:utf8", Settings::getControlFilename("mon_control.txt"));
-  print FILE join "\n", @lines;
-  close FILE;
 }
