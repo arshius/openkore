@@ -423,7 +423,7 @@ macro set_eq {
   $head = 18730 #topHead
   $off  = 2112  #leftHand
   $main = 1243  #rightHand
-  $robe  = 2510  #robe
+  $robe  = 2510 #robe
   $body = 2352  #armor
   $foot = 2414  #shoes
   if ($conf[0] > 0) {
@@ -864,13 +864,8 @@ automacro tutorial8_12 {
       rewrite(Poring, 0, 0, 0, skip)
       rewrite(Lunatic, 0, 0, 0, skip)
 
-      $map = replace_string($.InMapRegexLast,'prt_fild08([a-d])?$',"iz_ac01",'_$1')
-      do move $map 61 81
-      do talknpc 59 83 r0 r0
-      do talknpc 59 83 r0 r1
-      do talknpc 59 83 r0 r2
-      do talknpc 59 83 r0 r3
-	  lock tutorial8
+      $map = replace_string($.InMapRegexLast,'prt_fild08([a-d])?$',"izlude",'_$1')
+      do move $map 128 108
       lock tutorial8_12
     }
   }
@@ -878,11 +873,200 @@ automacro tutorial8_12 {
 }
 
 automacro tutorial9 {
-  InMapRegex /^iz_ac01(_[a-d])?$/
+  InMapRegex /^izlude(_[a-d])?$/
+  CheckOnAI manual
   exclusive 1
   run-once 1
+  priority 1
   call {
-    log [Tutorial]
+#    call 9_1
+#    call 9_2
+#    call 9_3
+#    call 9_4
+    lock tutorial8
+  }
+}
+
+macro 9_1 {
+  log [Tutorial] Refining quest
+  do move 151 130
+  do talknpc 153 126 r1 r0 r0
+}
+
+macro 9_2 {
+  log [Tutorial] Enchanting quest
+  do move 104 125
+  do talknpc 96 125 r0 r0 r2
+}
+
+macro 9_3 {
+  log [Tutorial] Shop keeper quest
+  do move 117 179
+  do talknpc 115 181 r1
+  do talknpc 115 181 r3 r1
+}
+
+macro 9_4 {
+  log [Tutorial] Treasure hunt quest
+  do move 122 205
+  do talknpc 120 207 r0
+}
+
+automacro tutorial9_1 {
+  InMapRegex /^izlude([a-d])?$/
+  QuestActive 7474
+  CheckOnAI manual
+  exclusive 1
+  run-once 1
+  priority 2
+  call {
+    log [Tutorial] finishing Treasure quest
+    do move 202 165
+    do talknpc 207 167 r0 r0
+    do move 177 68
+    do talknpc 179 75 r0
+    do move 55 100
+    do talknpc 45 94 r0 r0
+    do move 122 205
+    do talknpc 120 207 r0 r0
+  }
+}
+
+automacro tutorial9_2 {
+  InMapRegex /^izlude([a-d])?$/
+  QuestActive 1238
+  CheckOnAI manual
+  exclusive 1
+  run-once 1
+  priority 3
+  call {
+    log [Tutorial] finishing Shop quest
+    do move izlude_in 64 96
+    do talknpc 57 110 b b1,1 e
+    do move izlude 112 179
+    do talknpc 115 181
+    do talknpc 115 181 r1
+    do move izlude_in 64 96
+    do talknpc 57 110 s
+    do sell &inventory (Poor Can)
+    do sell done
+    do talknpc 115 181
+  }
+}
+
+automacro tutorial9_3 {
+  InMapRegex /^izlude([a-d])?$/
+  QuestActive 5157
+  InInventory "Cotton Shirt [1]" == 0
+  CheckOnAI manual
+  exclusive 1
+  run-once 1
+  priority 4
+  call {
+    log [Tutorial] finishing Enchanting quest
+    do move 104 125
+    do talknpc 96 125 r1
+    do talknpc 96 125
+    do talknpc 96 125 r0
+    $body = 2302
+  }
+}
+
+automacro tutorial9_4 {
+  InMapRegex /^izlude([a-d])?$/
+  QuestActive 5159
+  CheckOnAI manual
+  exclusive 1
+  run-once 1
+  priority 5
+  call {
+    log [Tutorial] finishing Enchanting quest 2
+    do talknpc 108 139 r1 r0 r0 r0
+    do talknpc 96 125 r0 r0 r0 t=ok
+    $main = 1201
+  }
+}
+
+automacro tutorial9_5 {
+  InMapRegex /^izlude([a-d])?$/
+  QuestActive 5153
+  CheckOnAI manual
+  exclusive 1
+  run-once 1
+  priority 6
+  call {
+    log [Tutorial] finishing Refining quest
+    do move 151 130
+    do talknpc 153 121 r="Knife" r0
+    do talknpc 153 126 r0
+    do talknpc 145 122 r2
+    do talknpc 153 126 r0 r0
+    do talknpc 155 132 r0 r2
+    do talknpc 153 126 r0 r0
+  }
+}
+
+automacro tutorial9_6 {
+  InMapRegex /^izlude([a-d])?$/
+  CheckOnAI manual
+  exclusive 1
+  run-once 1
+  priority 7
+  call {
+    log [Tutorial] First aid and Red Herb quest
+      $map = replace_string($.InMapRegexLast,'izlude([a-d])?$',"iz_ac01",'_$1')
+      do move $map 63 41
+      do talknpc 59 43 r1
+      do talknpc 59 43 r2
+  }
+}
+
+automacro tutorial9_7 {
+  InMapRegex /^iz_ac01([a-d])?$/
+  QuestActive 7478
+  InInventory "Red Herb" > 0
+  CheckOnAI manual
+  exclusive 1
+  run-once 1
+  priority 8
+  call {
+    log [Tutorial] finishing red herb quest
+    do move 63 41
+    do talknpc 59 43 r2
+  }
+}
+
+automacro tutorial9_8 {
+  InMapRegex /^iz_ac01([a-d])?$/
+  QuestActive 7478
+  InInventory "Red Herb" < 1
+  CheckOnAI manual
+  exclusive 1
+  run-once 1
+  priority 8
+  call {
+    log [Tutorial] fetching red herb
+#      do move 61 81
+#      do talknpc 59 83 r0 r0
+#      do talknpc 59 83 r0 r1
+#      do talknpc 59 83 r0 r2
+#      do talknpc 59 83 r0 r3
+  }
+}
+
+automacro tutorial9_9 {
+  InMapRegex /^iz_ac01([a-d])?$/
+  CheckOnAI manual
+  exclusive 1
+  run-once 1
+  priority 8
+  call {
+    log [Tutorial] finishing Battle quest
+    do move 61 81
+    do talknpc 59 83 r0 r0
+    do talknpc 59 83 r0 r1
+    do talknpc 59 83 r0 r2
+    do talknpc 59 83 r0 r3
   }
 }
 
@@ -894,7 +1078,7 @@ macro set_monster {
   if ( !$match1 || !$match2 || !$match3 ) {
     rewrite(@monster)
     do reload mon_control
-	pause 2
+pause 2
   }
 }
 
