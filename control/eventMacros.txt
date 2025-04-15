@@ -20,6 +20,7 @@ automacro initialize {
   exclusive 1
   run-once 1
   call {
+    $m_flag  = 0
     call close_tutorial_battle
   }
   timeout 15
@@ -422,7 +423,7 @@ macro set_eq {
   $head = 18730 #topHead
   $off  = 2112  #leftHand
   $main = 1243  #rightHand
-  $rob  = 2510  #robe
+  $robe  = 2510  #robe
   $body = 2352  #armor
   $foot = 2414  #shoes
   if ($conf[0] > 0) {
@@ -439,7 +440,7 @@ macro set_eq {
 }
 
 automacro set_equip {
-  InMapRegex /^iz_ac0[12](_[a-d])?$/
+#  InMapRegex /^iz_ac0[12](_[a-d])?$/
   IsNotEquippedID topHead $head, leftHand $off, rightHand $main, robe $robe, armor $body, shoes $foot, leftAccessory $acc1, rightAccessory $acc2
   CheckOnAI auto, manual
   exclusive 1
@@ -516,25 +517,25 @@ macro set_skills {
 }
 
 automacro set_attack0 {
-  InMapRegex /^iz_ac0[12](_[a-d])?$/
+#  InMapRegex /^iz_ac0[12](_[a-d])?$/
   ConfigKeyNot attackSkillSlot_0 $s0, attackSkillSlot_0_lvl $s0_lvl, attackSkillSlot_0_sp $s0_sp, attackSkillSlot_0_dist $s0_dist, attackSkillSlot_0_stopWhenHit $s0_w_hit, attackSkillSlot_0_monsters $s0_mon, attackSkillSlot_0_whenEquipped $s0_w_eq
-  CheckOnAI manual
+  CheckOnAI auto, manual
   exclusive 1
   call set_config
 }
 
 automacro set_attack1 {
-  InMapRegex /^iz_ac0[12](_[a-d])?$/
+#  InMapRegex /^iz_ac0[12](_[a-d])?$/
   ConfigKeyNot attackSkillSlot_1 $s1, attackSkillSlot_1_lvl $s1_lvl, attackSkillSlot_1_sp $s1_sp, attackSkillSlot_1_dist $s1_dist, attackSkillSlot_1_stopWhenHit $s1_w_hit, attackSkillSlot_1_monsters $s1_mon, attackSkillSlot_1_whenEquipped $s1_w_eq
-  CheckOnAI manual
+  CheckOnAI auto, manual
   exclusive 1
   call set_config
 }
 
 automacro set_recovery0 {
-  InMapRegex /^iz_ac0[12](_[a-d])?$/
+#  InMapRegex /^iz_ac0[12](_[a-d])?$/
   ConfigKeyNot useSelf_skill_0 $os0, useSelf_skill_0_lvl $os0_lvl, useSelf_skill_0_sp $os0_sp, useSelf_skill_0_hp $os0_hp, useSelf_skill_0_whenEquipped $os0_w_eq, useSelf_item_0 $i0, useSelf_item_0_hp $i0_hp
-  CheckOnAI manual
+  CheckOnAI auto, manual
   exclusive 1
   call set_config
 }
@@ -545,7 +546,7 @@ automacro tutorial7_1 {
   exclusive 1
   run-once 1
   priority 3
-  delay 5
+#  delay 10
   call {
     $map = replace_string($.InMapRegexLast,"2","1")
     do move $map 110 40
@@ -691,21 +692,21 @@ automacro tutorial8_4 {
 
 automacro tutorial8_5 {
   InMapRegex /^new_1-([1-4])?$/
-  MobNear /^Little/
+  MobNear /^Little Poring/
   InInventory "Little Unripe Apple" > 0
   QuestActive 2296
   exclusive 1
-  run-once 1
+#  run-once 1
   call {
     @pos = getPos($.MobNearLastPos,0,2)
     do move $pos[0] $pos[1]
-    while (&invamount (Little Poring Egg) == 0) {
+#    while (&invamount (Little Poring Egg) == 0) {
       do im &inventory (Little Unripe Apple) $.MobNearLastBinId
       do pet capture $.MobNearLastBinId
-      pause 0.5
-    }
+#      pause 0.5
+#    }
   }
-  timeout 15
+  timeout 0.5
 }
 
 automacro tutorial8_6 {
@@ -737,7 +738,6 @@ automacro tutorial8_7 {
     call do_tutorial_battle
     do move 59 80
     do talknpc 59 83 r1
-    #lock tutorial8_12
   }
   timeout 15
 }
@@ -745,16 +745,11 @@ automacro tutorial8_7 {
 automacro tutorial8_8 {
   InMapRegex /^prt_fild08([a-d])?$/
   QuestHuntOngoing 11339 1002
-  CheckOnAI manual
   exclusive 1
   run-once 1
   call {
-    $poring = 0
-    $setting = Poring
-    $attack = 1
-    $teleport = 0
-    $telesearch = 0
-    call tutorialHunt
+    @monster = (Poring, 1, 0, 0)
+    call set_monster
   }
   timeout 15
 }
@@ -765,13 +760,11 @@ automacro tutorial8_8a {
   InInventory "Jellopy" >= 5
   exclusive 1
   run-once 1
+  priority 5
   call {
-    $poring = 1
-    $setting = Poring
-    $attack = 0
-    $teleport = 0
-    $telesearch = 0
-    call tutorialHunt
+    $m_flag++
+    @monster = (Poring, 0, 0, 0)
+    call set_monster
   }
   timeout 15
 }
@@ -779,16 +772,11 @@ automacro tutorial8_8a {
 automacro tutorial8_9 {
   InMapRegex /^prt_fild08([a-d])?$/
   QuestHuntOngoing 11340 1063
-  CheckOnAI manual
   exclusive 1
   run-once 1
   call {
-    $lunatic = 0
-    $setting = Lunatic
-    $attack = 1
-    $teleport = 0
-    $telesearch = 0
-    call tutorialHunt
+    @monster = (Lunatic, 1, 0, 0)
+    call set_monster
   }
   timeout 15
 }
@@ -799,13 +787,11 @@ automacro tutorial8_9a {
   InInventory "Carrot" >= 1
   exclusive 1
   run-once 1
+  priority 5
   call {
-    $lunatic = 1
-    $setting = Lunatic
-    $attack = 0
-    $teleport = 0
-    $telesearch = 0
-    call tutorialHunt
+    $m_flag++
+    @monster = (Lunatic, 0, 0, 0)
+    call set_monster
   }
   timeout 15
 }
@@ -813,16 +799,11 @@ automacro tutorial8_9a {
 automacro tutorial8_10 {
   InMapRegex /^prt_fild08([a-d])?$/
   QuestHuntOngoing 11341 1007
-  CheckOnAI manual
   exclusive 1
   run-once 1
   call {
-    $fabre = 0
-    $setting = Fabre
-    $attack = 1
-    $teleport = 0
-    $telesearch = 0
-    call tutorialHunt
+    @monster = (Fabre, 1, 0, 0)
+    call set_monster
   }
   timeout 15
 }
@@ -833,13 +814,11 @@ automacro tutorial8_10a {
   InInventory "Fluff" >= 3
   exclusive 1
   run-once 1
+  priority 5
   call {
-    $fabre = 1
-    $setting = Fabre
-    $attack = 0
-    $teleport = 0
-    $telesearch = 0
-    call tutorialHunt
+    $m_flag++
+    @monster = (Fabre, 0, 0, 0)
+    call set_monster
   }
   timeout 15
 }
@@ -847,16 +826,11 @@ automacro tutorial8_10a {
 automacro tutorial8_11 {
   InMapRegex /^prt_fild08([a-d])?$/
   QuestHuntOngoing 11344 1008
-  CheckOnAI manual
   exclusive 1
   run-once 1
   call {
-    $pupa = 0
-    $setting = Pupa
-    $attack = 1
-    $teleport = 0
-    $telesearch = 0
-    call tutorialHunt
+    @monster = (Pupa, 1, 0, 0)
+    call set_monster
   }
   timeout 15
 }
@@ -867,13 +841,11 @@ automacro tutorial8_11a {
   InInventory "Shell" >= 2
   exclusive 1
   run-once 1
+  priority 5
   call {
-    $pupa = 1
-    $setting = Pupa
-    $attack = 0
-    $teleport = 0
-    $telesearch = 0
-    call tutorialHunt
+    $m_flag++
+    @monster = (Pupa, 0, 0, 0)
+    call set_monster
   }
   timeout 15
 }
@@ -882,40 +854,47 @@ automacro tutorial8_12 {
   InMapRegex /^prt_fild08([a-d])?$/
   QuestHuntCompleted 11339 1002, 11340 1063, 11341 1007, 11344 1008
   exclusive 1
-  run-once 1
-  priority 2
+  priority 6
   call {
-    if ($pupa > 0 && $fabre > 0 && $lunatic > 0 && $poring > 0) {
+    log \$m_flag is $m_flag
+    if ($m_flag == 4) {
       log [Tutorial] Report quest progress
       call close_tutorial_battle
+      rewrite(Fabre, 0, 0, 0, skip)
+      rewrite(Poring, 0, 0, 0, skip)
+      rewrite(Lunatic, 0, 0, 0, skip)
+
       $map = replace_string($.InMapRegexLast,'prt_fild08([a-d])?$',"iz_ac01",'_$1')
       do move $map 61 81
-      do talknpc 59 83
-      lock tutorial8
+      do talknpc 59 83 r0 r0
+      do talknpc 59 83 r0 r1
+      do talknpc 59 83 r0 r2
+      do talknpc 59 83 r0 r3
+	  lock tutorial8
+      lock tutorial8_12
     }
   }
   timeout 15
 }
 
-macro tutorialHunt {
-  $param1 = &eval (defined Misc::mon_control("$setting")?Misc::mon_control("$setting")->{attack_auto}:"None")
-  #$param2 = &eval (defined Misc::mon_control("$setting")?Misc::mon_control("$setting")->{teleport_auto}:"None")
-  #$param3 = &eval (defined Misc::mon_control("$setting")?Misc::mon_control("$setting")->{teleport_search}:"None")
+automacro tutorial9 {
+  InMapRegex /^iz_ac01(_[a-d])?$/
+  exclusive 1
+  run-once 1
+  call {
+    log [Tutorial]
+  }
+}
 
-  log $setting is $param1
-  if ($param1 eq "None") {
-    rewrite($setting, append, $attack, $teleport, $telesearch)
-	do reload mon_control
-  } else {
-    $match1 = $param1 == $attack
-    $match2 = $param2 == $teleport
-    $match3 = $param3 == $telesearch
+macro set_monster {
+  $match1 = &eval ((defined Misc::mon_control("$monster[0]")->{attack_auto}?Misc::mon_control("$monster[0]")->{attack_auto}:"None") eq $monster[1])
+  $match2 = &eval ((defined Misc::mon_control("$monster[0]")->{teleport_auto}?Misc::mon_control("$monster[0]")->{teleport_auto}:"None") eq $monster[2])
+  $match3 = &eval ((defined Misc::mon_control("$monster[0]")->{teleport_search}?Misc::mon_control("$monster[0]")->{teleport_search}:"None") eq $monster[3])
 
-    if ( !match1 || !match2 !! !$match3) {
-      do eval Misc::mon_control("$setting")->{attack_auto} = $attack; Misc::mon_control("$setting")->{teleport_auto} = $teleport; Misc::mon_control("$setting")->{teleport_search} = $telesearch
-      rewrite($setting)
-      do reload mon_control
-    }
+  if ( !$match1 || !$match2 || !$match3 ) {
+    rewrite(@monster)
+    do reload mon_control
+	pause 2
   }
 }
 
@@ -931,7 +910,7 @@ sub replace_string {
     } else {
       $regex = '"'. $to . $interpolate . '"';
       $string =~ s/$from/$regex/ee;
-}
+    }
   }
   return $string;
 }
@@ -950,36 +929,34 @@ sub add_key {
 }
 
 sub rewrite {
-  my ($name, $append, $arg1, $arg2, $arg3) = @_;
+  my (@mob) = @_;
+  my $monster = Misc::mon_control("$mob[0]");
+  my @lines = ();
+  my $found = 0;
+  my $skip = $mob[$#mob] if ($#mob > 3);
 
-  if ($append eq "") {
-    my $monster = Misc::mon_control("$name");
-    my @lines = ();
-
-    if (open(FILE, "<:utf8", Settings::getControlFilename("mon_control.txt"))) {
-      while (<FILE>) {
-        s/\x{FEFF}//g; chomp;
-        if (/^#/ || /^\n/ || /^\r/) {
-          push @lines,$_;
-          next
-        }
-        /^(\d+|([a-zA-Z' ]+)*) -?\d/;
-        if ("$name" eq $1 && defined $monster) {
-          $_ = $1;
-          s/\s+$//;
-          push(@lines, ($_ . " $monster->{attack_auto} $monster->{teleport_auto} $monster->{teleport_search} $monster->{attack_lvl} $monster->{attack_jlvl} $monster->{attack_hp} $monster->{attack_sp} $monster->{weight}"));
-        } else {
-          push(@lines, $_);
-        }
+  if (open(FILE, "<:utf8", Settings::getControlFilename("mon_control.txt"))) {
+    while (<FILE>) {
+      s/\x{FEFF}//g; chomp;
+      if (/^#/ || /^\n/ || /^\r/) {
+        push @lines,$_;
+        next
       }
-      close FILE
+      /^(\d+|([a-zA-Z' ]+)*) -?\d/;
+      if ("$mob[0]" eq $1 && defined $monster) {
+        $found = 1;
+        $_ = $1 . " $mob[1] $mob[2] $mob[3] $monster->{attack_lvl} $monster->{attack_jlvl} $monster->{attack_hp} $monster->{attack_sp} $monster->{weight}";
+        s/\s+$//;
+        push(@lines, $_) if (!$skip);
+      } else {
+        push(@lines, $_);
+      }
     }
-    open(FILE, ">:utf8", Settings::getControlFilename("mon_control.txt"));
-    print FILE join "\n", @lines;
+    push(@lines, $mob[0] . " $mob[1] $mob[2] $mob[3]") if (!$found);
     close FILE;
-  } else {
-    open(FILE, ">>:utf8", Settings::getControlFilename("mon_control.txt"));
-	print FILE $name . " $arg1 $arg2 $arg3\n";
-	close FILE;
   }
+  open(FILE, ">:utf8", Settings::getControlFilename("mon_control.txt"));
+  print FILE join "\n", @lines;
+  close FILE;
 }
+
