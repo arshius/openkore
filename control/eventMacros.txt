@@ -27,9 +27,22 @@ automacro initialize {
     $a_stats = 1
     $a_stats_bonus = 1
     $a_sit_hp_low = 20
+    $attack = -1
+    $walk = 0
 
-    call close_tutorial_battle
+    lock tutorial6_2
+    lock tutorial6_4
+    lock tutorial6_6
+    lock tutorial7
+    lock tutorial7_1
+    lock tutorial8
+    lock tutorial8_4
+    lock tutorial8_7
+    lock tutorial9
+    lock tutorial9_6
+    lock tutorial9_9
     lock tutorial_end
+    do ai manual
   }
   timeout 15
 }
@@ -74,7 +87,6 @@ macro do_tutorial_battle {
   $attack = 2
   $walk = 1
   $tank = 0
-  do ai on
 }
 
 macro close_tutorial_battle {
@@ -82,19 +94,19 @@ macro close_tutorial_battle {
   $attack = -1
   $walk = 0
   $tank = 1
-  do ai manual
 }
 
 automacro tutorial1 {
   InMapRegex /^iz_int(0[1-4])?$/
   CheckOnAI manual
   exclusive 1
-  priority 1
+  priority 2
   run-once 1
   call {
     log [Tutorial] Begin move out from ship
     do move 52 30
     do talknpc 56 32
+    do ai on
   }
   timeout 15
 }
@@ -102,7 +114,6 @@ automacro tutorial1 {
 automacro tutorial2 {
   InMapRegex /^iz_int(0[1-4])?$/
   QuestActive 21001
-  CheckOnAI manual
   exclusive 1
   run-once 1
   call {
@@ -133,9 +144,22 @@ automacro tutorial3 {
   QuestActive 21008
   exclusive 1
   run-once 1
+  priority 1
+  call {
+    call close_tutorial_battle
+  }
+  timeout 15
+}
+
+automacro tutorial3_1 {
+  InMapRegex /^int_land(0[1-4])?$/
+  InInventory "Wood" >= 3
+  QuestActive 21008
+  exclusive 1
+  run-once 1
+  priority 2
   call {
     log [Tutorial] Report to sailor to hand over Wood
-    call close_tutorial_battle
     do move 61 71
     do talknpc 58 69
     do move 78 100
@@ -143,7 +167,6 @@ automacro tutorial3 {
     do talknpc 73 100
     do talknpc 73 100 r0
     do move 49 57
-    do ai on
   }
   timeout 15
 }
@@ -177,7 +200,6 @@ automacro tutorial5 {
     do talknpc 100 39 r0
     $map = replace_string($map,"1","2")
     do move $map 207 27
-    do ai manual
   }
   timeout 15
 }
@@ -185,7 +207,6 @@ automacro tutorial5 {
 automacro tutorial6 {
   exclusive 1
   InMapRegex /^iz_ac02(_[a-d])?$/
-  CheckOnAI manual
   run-once 1
   call {
     if (&inventory (Swordman Manual) < 0) {
@@ -299,14 +320,11 @@ macro 6_9 {
   do talknpc 50 169 r1
   do talknpc 50 169 r1 r1
   if ($.zeny < 100) {
-#    Todo: change move behavior because teleport move player to main map not a/b/c/d map
-#    $c_map = $.map
-#    $map = replace_string($.map,"iz_ac02","izlude")
     do move izlude 121 170
     do talknpc 124 165 s
     do sell &inventory (Magnifier)
     do sell done
-    do move $map 48 167
+    do move iz_ac02 48 167
   }
   do talknpc 50 169
   do talknpc 50 169
@@ -324,30 +342,24 @@ macro 6_9a {
 automacro tutorial6_1 {
   InMapRegex /^iz_ac02(_[a-d])?$/
   QuestActive 7484, 7485
-  CheckOnAI manual
   exclusive 1
   run-once 1
   call {
     log [Tutorial] finishing thief tutorial quest
     do move 54 134
-    lock tutorial6_4
-    lock tutorial6_6
-    lock tutorial7
-    lock tutorial7_1
-    lock tutorial8
   }
   timeout 15
 }
 
 automacro tutorial6_2 {
   InMapRegex /^iz_ac02(_[a-d])?$/
-  MobNotNear /^Poring$/
-  QuestActive 7484, 7485
-  CheckOnAI manual
+  QuestActive 7484
+  exclusive 1
   priority 1
   call {
     log [Tutorial] Refresh poring
-#    do talknpc 49 134
+    do talknpc 49 134 r0
+    lock tutorial6_2
   }
   timeout 15
 }
@@ -357,7 +369,6 @@ automacro tutorial6_3 {
   MobNear /^Poring$/
   QuestActive 7485
   InInventory "Stone" < 1
-  CheckOnAI manual
   priority 2
   call {
     log [Tutorial] Steal from poring
@@ -367,10 +378,7 @@ automacro tutorial6_3 {
     }
     $m_id = $.MobNearLastBinId
     do move $pos[0] $pos[1]
-#    while (&invamount (Stone) == 0) {
-      do sm TF_STEAL $m_id
-#      pause 1
-#    }
+    do sm TF_STEAL $m_id
     if (&invamount (Stone) > 0) {
       release tutorial6_4
     }
@@ -382,7 +390,6 @@ automacro tutorial6_4 {
   InMapRegex /^iz_ac02(_[a-d])?$/
   MobNear /^Poring$/
   QuestActive 7485
-  CheckOnAI manual
   priority 2
   call {
     log [Tutorial] Kill Poring with Envenom
@@ -401,9 +408,9 @@ automacro tutorial6_5 {
   InMapRegex /^iz_ac02(_[a-d])?$/
   CurrentSP < 24
   QuestActive 7484, 7485
-  CheckOnAI manual
   exclusive 1
   call {
+    release tutorial6_2
     do talknpc 55 134 r0
   }
   timeout 15
@@ -412,7 +419,6 @@ automacro tutorial6_5 {
 automacro tutorial6_6 {
   InMapRegex /^iz_ac02(_[a-d])?$/
   QuestInactive 7485
-  CheckOnAI manual
   priority 3
   call {
     release tutorial7
@@ -425,7 +431,6 @@ automacro tutorial7 {
   IsNotEquippedID leftAccessory 2821, rightAccessory 2824
   IsNotEquippedID leftAccessory 2820, rightAccessory 2819
   IsNotEquippedID leftAccessory 2819, rightAccessory 2821
-  CheckOnAI manual
   exclusive 1
   run-once 1
   priority 2
@@ -439,8 +444,6 @@ automacro tutorial7 {
     } else {
       @conf = (1,0,0)
     }
-
-#    log $conf[0] , $conf[1], $conf[2]
 
     call set_eq
     call set_skills
@@ -568,7 +571,6 @@ automacro set_recovery0 {
 
 automacro tutorial7_1 {
   InMapRegex /^iz_ac02(_[a-d])?$/
-  CheckOnAI manual
   exclusive 1
   run-once 1
   priority 3
@@ -584,7 +586,6 @@ automacro tutorial7_1 {
 automacro tutorial8 {
   InMapRegex /^iz_ac01(_[a-d])?$/
   QuestInactive 11339, 11340, 11341, 11344
-  CheckOnAI manual
   exclusive 1
   run-once 1
   call {
@@ -595,7 +596,6 @@ automacro tutorial8 {
     call 8_5
     call 8_6
     call 8_7
-    lock tutorial9_9
   }
 }
 
@@ -650,7 +650,6 @@ macro 8_7 {
 automacro tutorial8_1 {
   InMapRegex /^iz_ac01(_[a-d])?$/
   QuestActive 2299
-  CheckOnAI manual
   exclusive 1
   run-once 1
   priority 1
@@ -659,8 +658,6 @@ automacro tutorial8_1 {
     if ($.pos != 55 72) {
       do move 55 72
     }
-    lock tutorial8_4
-    lock tutorial8_7
     call close_tutorial_battle
   }
 }
@@ -669,7 +666,6 @@ automacro tutorial8_2 {
   InMapRegex /^iz_ac01(_[a-d])?$/
   MobNear /Fire/
   QuestActive 2299
-  CheckOnAI manual
   run-once 1
   priority 2
   call {
@@ -685,7 +681,6 @@ automacro tutorial8_3 {
   InMapRegex /^iz_ac01(_[a-d])?$/
   QuestActive 2299
   SimpleHookEvent damage
-  CheckOnAI manual
   exclusive 1
   run-once 1
   call {
@@ -701,13 +696,13 @@ automacro tutorial8_3 {
 automacro tutorial8_4 {
   InMapRegex /^iz_ac01(_[a-d])?$/
   QuestActive 2293
-  CheckOnAI manual
   exclusive 1
   run-once 1
   priority 3
   call {
+    log [Tutorial] finishing pet quest
     call do_tutorial_battle
-    $attack = 0
+    $attack = -1
     do move 47 80
     do talknpc 45 80 r0
     do talknpc 92 169
@@ -723,16 +718,13 @@ automacro tutorial8_5 {
   InInventory "Little Unripe Apple" > 0
   QuestActive 2296
   exclusive 1
-#  run-once 1
   priority 2
   call {
+    log [Tutorial] Taming Little Poring
     @pos = getPos($.MobNearLastPos,0,2)
     do move $pos[0] $pos[1]
-#    while (&invamount (Little Poring Egg) == 0) {
-      do im &inventory (Little Unripe Apple) $.MobNearLastBinId
-      do pet capture $.MobNearLastBinId
-#      pause 0.5
-#    }
+    do im &inventory (Little Unripe Apple) $.MobNearLastBinId
+    do pet capture $.MobNearLastBinId
   }
   timeout 0.5
 }
@@ -744,6 +736,7 @@ automacro tutorial8_6 {
   run-once 1
   priority 1
   call {
+    log [Tutorial] Taming success
     do move 99 167
     do talknpc 99 169 r0
     do talknpc 92 169 r0
@@ -757,11 +750,11 @@ automacro tutorial8_6 {
 automacro tutorial8_7 {
   InMapRegex /^iz_ac01(_[a-d])?$/
   QuestActive 11339, 11340, 11341, 11342, 11344
-  CheckOnAI manual
   exclusive 1
   run-once 1
   priority 4
   call {
+    log [Tutorial] finishing battle quest
     call do_tutorial_battle
     do move 59 80
     do talknpc 59 83 r1
@@ -771,11 +764,14 @@ automacro tutorial8_7 {
 
 automacro tutorial8_8 {
   InMapRegex /^prt_fild08([a-d])?$/
-  QuestHuntOngoing 11339 1002
+  QuestActive 11339
   exclusive 1
   run-once 1
   call {
+    log [Tutorial] hunting poring
     @monster = (Poring, 1, 0, 0)
+    call set_monster
+    @monster = (Little Poring, 0, 0, 0)
     call set_monster
   }
   timeout 15
@@ -789,6 +785,7 @@ automacro tutorial8_8a {
   run-once 1
   priority 5
   call {
+    log [Tutorial] stop hunting poring
     $m_flag++
     @monster = (Poring, 0, 0, 0)
     call set_monster
@@ -798,10 +795,11 @@ automacro tutorial8_8a {
 
 automacro tutorial8_9 {
   InMapRegex /^prt_fild08([a-d])?$/
-  QuestHuntOngoing 11340 1063
+  QuestActive 11340
   exclusive 1
   run-once 1
   call {
+    log [Tutorial] hunting lunatic
     @monster = (Lunatic, 1, 0, 0)
     call set_monster
   }
@@ -816,6 +814,7 @@ automacro tutorial8_9a {
   run-once 1
   priority 5
   call {
+    log [Tutorial] stop hunting lunatic
     $m_flag++
     @monster = (Lunatic, 0, 0, 0)
     call set_monster
@@ -825,10 +824,11 @@ automacro tutorial8_9a {
 
 automacro tutorial8_10 {
   InMapRegex /^prt_fild08([a-d])?$/
-  QuestHuntOngoing 11341 1007
+  QuestActive 11341
   exclusive 1
   run-once 1
   call {
+    log [Tutorial] hunting fabre
     @monster = (Fabre, 1, 0, 0)
     call set_monster
   }
@@ -843,6 +843,7 @@ automacro tutorial8_10a {
   run-once 1
   priority 5
   call {
+    log [Tutorial] stop hunting fabre
     $m_flag++
     @monster = (Fabre, 0, 0, 0)
     call set_monster
@@ -852,11 +853,14 @@ automacro tutorial8_10a {
 
 automacro tutorial8_11 {
   InMapRegex /^prt_fild08([a-d])?$/
-  QuestHuntOngoing 11344 1008
+  QuestActive 11344
   exclusive 1
   run-once 1
   call {
+    log [Tutorial] hunting pupa
     @monster = (Pupa, 1, 0, 0)
+    call set_monster
+    @monster = (Creamy, 0, 0, 0)
     call set_monster
   }
   timeout 15
@@ -870,6 +874,7 @@ automacro tutorial8_11a {
   run-once 1
   priority 5
   call {
+    log [Tutorial] stop hunting pupa
     $m_flag++
     @monster = (Pupa, 0, 0, 0)
     call set_monster
@@ -883,25 +888,41 @@ automacro tutorial8_12 {
   exclusive 1
   priority 6
   call {
-    log \$m_flag is $m_flag
     if ($m_flag == 4) {
-      log [Tutorial] Report quest progress
+      log [Tutorial] go back to town
       call close_tutorial_battle
       rewrite(Fabre, 0, 0, 0, skip)
       rewrite(Poring, 0, 0, 0, skip)
       rewrite(Lunatic, 0, 0, 0, skip)
+      rewrite(Creamy, 0, 0, 0, skip)
+      rewrite(Little Poring, 0, 0, 0, skip)
 
       $map = replace_string($.InMapRegexLast,'prt_fild08([a-d])?$',"izlude",'_$1')
       do move $map 128 108
       lock tutorial8_12
+      lock tutorial8_13
+      release tutorial9
     }
   }
   timeout 15
 }
 
+automacro tutorial8_13 {
+  InMapRegex /^izlude(_[a-d])?$/
+  QuestActive 11339, 11340, 11341, 11344
+  QuestInactive 7474, 1238, 5157, 5153
+  exclusive 1
+  priority 1
+  call {
+    $map = replace_string($.InMapRegexLast,'izlude_([a-d])?$',"prt_fild08",'$1')
+    do move $map 367 212
+    call do_tutorial_battle
+  }
+}
+
 automacro tutorial9 {
   InMapRegex /^izlude(_[a-d])?$/
-  CheckOnAI manual
+  QuestInactive 7474, 1238, 5157, 5153
   exclusive 1
   run-once 1
   priority 1
@@ -940,9 +961,8 @@ macro 9_4 {
 }
 
 automacro tutorial9_1 {
-  InMapRegex /^izlude([a-d])?$/
+  InMapRegex /^izlude(_[a-d])?$/
   QuestActive 7474
-  CheckOnAI manual
   exclusive 1
   run-once 1
   priority 2
@@ -960,9 +980,8 @@ automacro tutorial9_1 {
 }
 
 automacro tutorial9_2 {
-  InMapRegex /^izlude([a-d])?$/
+  InMapRegex /^izlude(_[a-d])?$/
   QuestActive 1238
-  CheckOnAI manual
   exclusive 1
   run-once 1
   priority 3
@@ -983,10 +1002,9 @@ automacro tutorial9_2 {
 }
 
 automacro tutorial9_3 {
-  InMapRegex /^izlude([a-d])?$/
+  InMapRegex /^izlude(_[a-d])?$/
   QuestActive 5157
   InInventory "Cotton Shirt [1]" == 0
-  CheckOnAI manual
   exclusive 1
   run-once 1
   priority 4
@@ -1001,9 +1019,8 @@ automacro tutorial9_3 {
 }
 
 automacro tutorial9_4 {
-  InMapRegex /^izlude([a-d])?$/
+  InMapRegex /^izlude(_[a-d])?$/
   QuestActive 5159
-  CheckOnAI manual
   exclusive 1
   run-once 1
   priority 5
@@ -1016,9 +1033,8 @@ automacro tutorial9_4 {
 }
 
 automacro tutorial9_5 {
-  InMapRegex /^izlude([a-d])?$/
+  InMapRegex /^izlude(_[a-d])?$/
   QuestActive 5153
-  CheckOnAI manual
   exclusive 1
   run-once 1
   priority 6
@@ -1031,29 +1047,29 @@ automacro tutorial9_5 {
     do talknpc 153 126 r0 r0
     do talknpc 155 132 r0 r2
     do talknpc 153 126 r0 r0
+    release tutorial9_6
   }
 }
 
 automacro tutorial9_6 {
-  InMapRegex /^izlude([a-d])?$/
-  CheckOnAI manual
+  InMapRegex /^izlude(_[a-d])?$/
+  QuestInactive 7478
   exclusive 1
   run-once 1
   priority 7
   call {
     log [Tutorial] First aid and Red Herb quest
-      $map = replace_string($.InMapRegexLast,'izlude([a-d])?$',"iz_ac01",'_$1')
-      do move $map 63 41
-      do talknpc 59 43 r1
-      do talknpc 59 43 r2
+    $map = replace_string($.InMapRegexLast,"izlude","iz_ac01")
+    do move $map 63 41
+    do talknpc 59 43 r1
+    do talknpc 59 43 r2
   }
 }
 
 automacro tutorial9_7 {
-  InMapRegex /^iz_ac01([a-d])?$/
+  InMapRegex /^iz_ac01(_[a-d])?$/
   QuestActive 7478
   InInventory "Red Herb" > 0
-  CheckOnAI manual
   exclusive 1
   run-once 1
   priority 8
@@ -1061,48 +1077,52 @@ automacro tutorial9_7 {
     log [Tutorial] finishing red herb quest
     do move 63 41
     do talknpc 59 43 r2
+    lock tutorial9_6
     release tutorial9_9
+    $attack = -1
   }
 }
 
 automacro tutorial9_8 {
-  InMapRegex /^iz_ac01([a-d])?$/
+  InMapRegex /^iz_ac01(_[a-d])?$/
   QuestActive 7478
   InInventory "Red Herb" < 1
-  CheckOnAI manual
   exclusive 1
   run-once 1
   priority 8
   call {
     log [Tutorial] fetching red herb
-#      do move 61 81
-#      do talknpc 59 83 r0 r0
-#      do talknpc 59 83 r0 r1
-#      do talknpc 59 83 r0 r2
-#      do talknpc 59 83 r0 r3
+    $c_map = $.InMapRegexLast
+    $map = replace_string($.InMapRegexLast,"iz_ac01","izlude")
+    do move $map 127 253
+    do talknpc 140 249 r0 r0 r0
+    do move $c_map 63 41
   }
 }
 
 automacro tutorial9_9 {
-  InMapRegex /^iz_ac01([a-d])?$/
-  CheckOnAI manual
+  InMapRegex /^iz_ac01(_[a-d])?$/
+  QuestInactive 7478
   exclusive 1
   run-once 1
   priority 9
   call {
     log [Tutorial] finishing Battle quest
     do move 61 81
-    do talknpc 59 83 r0 r0
-    do talknpc 59 83 r0 r1
-    do talknpc 59 83 r0 r2
-    do talknpc 59 83 r0 r3
+    if ($.joblvl < 10) {
+      do talknpc 59 83 r0 r0
+      do talknpc 59 83 r0 r1
+      do talknpc 59 83 r0 r2
+      do talknpc 59 83 r0 r3
+    } else {
+      do talknpc 59 83
+    }
     release tutorial_end
   }
 }
 
 automacro tutorial_end {
-  InMapRegex /^iz_ac01([a-d])?$/
-  CheckOnAI manual
+  InMapRegex /^iz_ac01(_[a-d])?$/
   exclusive 1
   run-once 1
   priority 1
@@ -1137,7 +1157,6 @@ macro set_monster {
   $match1 = &eval ((defined Misc::mon_control("$monster[0]")->{attack_auto}?Misc::mon_control("$monster[0]")->{attack_auto}:"None") eq $monster[1])
   $match2 = &eval ((defined Misc::mon_control("$monster[0]")->{teleport_auto}?Misc::mon_control("$monster[0]")->{teleport_auto}:"None") eq $monster[2])
   $match3 = &eval ((defined Misc::mon_control("$monster[0]")->{teleport_search}?Misc::mon_control("$monster[0]")->{teleport_search}:"None") eq $monster[3])
-
   if ( !$match1 || !$match2 || !$match3 ) {
     rewrite(@monster)
     do reload mon_control
@@ -1181,9 +1200,6 @@ sub rewrite {
   my @lines = ();
   my $found = 0;
   my $skip = $mob[$#mob] if ($#mob > 3);
-  
-  my $monfile = Settings::getControlFilename("mon_control.txt");
-  message "$monfile";
 
   if (open(FILE, "<:utf8", Settings::getControlFilename("mon_control.txt"))) {
     while (<FILE>) {
