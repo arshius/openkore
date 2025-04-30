@@ -30,17 +30,18 @@ automacro initialize {
     $attack = -1
     $walk = 0
 
+    lock tutorial5_1
     lock tutorial6_2
     lock tutorial6_4
     lock tutorial6_6
     lock tutorial7
     lock tutorial7_1
-    lock tutorial8
     lock tutorial8_4
     lock tutorial8_7
     lock tutorial9
     lock tutorial9_6
     lock tutorial9_9
+	lock tutorial9_10
     lock tutorial_end
     do ai manual
   }
@@ -195,9 +196,29 @@ automacro tutorial5 {
     do talknpc 122 207
     do is &inventory (Apple Juice)
     do talknpc 122 207 r0
+    #$map = replace_string($.InMapRegexLast,"izlude","iz_ac01")
+    #do move $map 98 34
+    #do talknpc 100 39 r0
+    #do talknpc 103 42
+    #do talknpc 100 39 r2
+    #$map = replace_string($map,"1","2")
+    #do move $map 207 27
+    release tutorial5_1
+  }
+  timeout 15
+}
+
+automacro tutorial5_1 {
+  exclusive 1
+  InMapRegex /^izlude(_[a-d])?$/
+  run-once 1
+  call {
+    log [Tutorial] Join academy
     $map = replace_string($.InMapRegexLast,"izlude","iz_ac01")
     do move $map 98 34
     do talknpc 100 39 r0
+    do talknpc 103 42
+    do talknpc 100 39 r2
     $map = replace_string($map,"1","2")
     do move $map 207 27
   }
@@ -209,6 +230,7 @@ automacro tutorial6 {
   InMapRegex /^iz_ac02(_[a-d])?$/
   run-once 1
   call {
+    $o_map = replace_string($.InMapRegexLast,"iz_ac02","")
     if (&inventory (Swordman Manual) < 0) {
       call 6_1
       call 6_1a
@@ -571,21 +593,23 @@ automacro set_recovery0 {
 
 automacro tutorial7_1 {
   InMapRegex /^iz_ac02(_[a-d])?$/
+  QuestActive 101
   exclusive 1
   run-once 1
   priority 3
   call {
+    log [Tutorial] Talk to professor
     $map = replace_string($.InMapRegexLast,"2","1")
-    do move $map 110 40
-    release tutorial8
+    do move $map 99 140
+    do talknpc 99 146
+    do talknpc 99 146
   }
   timeout 15
-
 }
 
 automacro tutorial8 {
   InMapRegex /^iz_ac01(_[a-d])?$/
-  QuestInactive 11339, 11340, 11341, 11344
+  QuestActive 102
   exclusive 1
   run-once 1
   call {
@@ -595,56 +619,87 @@ automacro tutorial8 {
     call 8_4
     call 8_5
     call 8_6
-    call 8_7
   }
 }
 
 macro 8_1 {
-  log [Tutorial] Learn about abnormal status
-  do move 132 45
-  do talknpc 134 47 r1
-  do talknpc 134 47
-}
-
-macro 8_2 {
   log [Tutorial] Learn about attribute
   do move 55 72
+  do talknpc 53 74
   do talknpc 53 74 r2
 }
 
-macro 8_3 {
+macro 8_2 {
   log [Tutorial] Learn about pet
   if ($.pos != 55 72) {
     do move 55 72
   }
+  do talknpc 45 80
   do talknpc 45 80 r0 r0 r0 r0
 }
 
-macro 8_4 {
+macro 8_3 {
   log [Tutorial] Learn about battle
   do move 47 80
+  do talknpc 59 83
   do talknpc 59 83 r0 r0 r0
 }
 
-macro 8_5 {
+macro 8_4 {
   if ($.pos != 47 80) {
     do move 47 80
   }
   do talknpc 59 83 r0 r1 r0
 }
 
-macro 8_6 {
+macro 8_5 {
   if ($.pos != 47 80) {
     do move 47 80
   }
   do talknpc 59 83 r0 r2 r0
 }
 
-macro 8_7 {
+macro 8_6 {
   if ($.pos != 47 80) {
     do move 47 80
   }
   do talknpc 59 83 r0 r3 r0
+}
+
+automacro tutorial8a {
+  InMapRegex /^iz_ac01(_[a-d])?$/
+  QuestActive 103, 104, 105
+  exclusive 1
+  run-once 1
+  priority 1
+  call {
+    log [Tutorial] report to professor about Instructors
+    do move 99 140
+    do talknpc 99 146
+    do talknpc 99 146
+  }
+}
+
+automacro tutorial8b {
+  InMapRegex /^iz_ac01(_[a-d])?$/
+  QuestActive 106
+  exclusive 1
+  run-once 1
+  priority 1
+  call {
+    log [Tutorial] report to professor about Books
+    do move 99 140
+    do talknpc 99 146
+    do talknpc 99 146
+    call 8b_1
+  }
+}
+
+macro 8b_1 {
+  log [Tutorial] Learn about abnormal status
+  do move 132 45
+  do talknpc 134 47 r1
+  do talknpc 134 47
 }
 
 automacro tutorial8_1 {
@@ -756,7 +811,7 @@ automacro tutorial8_7 {
   call {
     log [Tutorial] finishing battle quest
     call do_tutorial_battle
-    do move 59 80
+    do move $.InMapRegexLast$o_map 59 80
     do talknpc 59 83 r1
   }
   timeout 15
@@ -1061,6 +1116,7 @@ automacro tutorial9_6 {
     log [Tutorial] First aid and Red Herb quest
     $map = replace_string($.InMapRegexLast,"izlude","iz_ac01")
     do move $map 63 41
+    do talknpc 59 43
     do talknpc 59 43 r1
     do talknpc 59 43 r2
   }
@@ -1117,40 +1173,79 @@ automacro tutorial9_9 {
     } else {
       do talknpc 59 83
     }
+    release tutorial9_10
+  }
+}
+
+automacro tutorial9_10 {
+  InMapRegex /^iz_ac01(_[a-d])?$/
+  QuestActive 108
+  exclusive 1
+  run-once 1
+  priority 10
+  call {
+    log [Tutorial] report to professor about Injury
+    do move 99 140
+    do talknpc 99 146
+    do talknpc 99 146
+  }
+}
+
+automacro tutorial9_10a {
+  InMapRegex /^iz_ac01(_[a-d])?$/
+  QuestActive 110
+  exclusive 1
+  run-once 1
+  priority 11
+  call {
+    log [Tutorial] report to principal
+    $map = replace_string($.InMapRegexLast,"1","2")
+    do move $map 103 200
+    do talknpc 103 209
     release tutorial_end
   }
 }
 
 automacro tutorial_end {
   InMapRegex /^iz_ac01(_[a-d])?$/
+  QuestActive 60457
   exclusive 1
   run-once 1
   priority 1
   call {
-    call do_tutorial_battle
-    $s0 = none
-    $s0_lvl = none
-    $s0_sp = > 10
-    $s0_dist = 1
-    $s0_w_hit = 0
-    $s0_mon = none
-    $s0_w_eq = none
-    $s1 = none
-    $s1_lvl = none
-    $s1_sp = > 10
-    $s1_dist = 1
-    $s1_w_hit = 0
-    $s1_mon = none
-    $s1_w_eq = none
-    $os0 = none
-    $os0_lvl = none
-    $os0_sp = > 10
-    $os0_hp = none
-    $os0_w_eq = none
-    $i0 = none
-    $i0_hp = none
-    lock all
+    $map = replace_string($.InMapRegexLast,"iz_ac01","izlude")
+    do move $map 131 145
+    do talknpc 131 148 r0
+    do move 27 30
+    do talknpc 27 35 r1 r0 r="$.name" r="$.name"
+    call end
   }
+}
+
+macro end {
+  call do_tutorial_battle
+  $s0 = none
+  $s0_lvl = none
+  $s0_sp = > 10
+  $s0_dist = 1
+  $s0_w_hit = 0
+  $s0_mon = none
+  $s0_w_eq = none
+  $s1 = none
+  $s1_lvl = none
+  $s1_sp = > 10
+  $s1_dist = 1
+  $s1_w_hit = 0
+  $s1_mon = none
+  $s1_w_eq = none
+  $os0 = none
+  $os0_lvl = none
+  $os0_sp = > 10
+  $os0_hp = none
+  $os0_w_eq = none
+  $i0 = none
+  $i0_hp = none
+  lock all
 }
 
 macro set_monster {
