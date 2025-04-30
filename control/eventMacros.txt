@@ -41,7 +41,7 @@ automacro initialize {
     lock tutorial9
     lock tutorial9_6
     lock tutorial9_9
-	lock tutorial9_10
+    lock tutorial9_10
     lock tutorial_end
     do ai manual
   }
@@ -101,8 +101,8 @@ automacro tutorial1 {
   InMapRegex /^iz_int(0[1-4])?$/
   CheckOnAI manual
   exclusive 1
-  priority 2
   run-once 1
+  priority 2
   call {
     log [Tutorial] Begin move out from ship
     do move 52 30
@@ -173,9 +173,9 @@ automacro tutorial3_1 {
 }
 
 automacro tutorial4 {
-  exclusive 1
   InMapRegex /^izlude(_[a-d])?$/
   IsInCoordinate 196 209
+  exclusive 1
   run-once 1
   call {
     log [Tutorial] Report to captain again in izlude
@@ -185,10 +185,10 @@ automacro tutorial4 {
 }
 
 automacro tutorial5 {
-  exclusive 1
   InMapRegex /^izlude(_[a-d])?$/
   QuestActive 7472
   CharCurrentWeight < 1000
+  exclusive 1
   run-once 1
   call {
     log [Tutorial] Report to academy staff
@@ -209,8 +209,8 @@ automacro tutorial5 {
 }
 
 automacro tutorial5_1 {
-  exclusive 1
   InMapRegex /^izlude(_[a-d])?$/
+  exclusive 1
   run-once 1
   call {
     log [Tutorial] Join academy
@@ -226,8 +226,8 @@ automacro tutorial5_1 {
 }
 
 automacro tutorial6 {
-  exclusive 1
   InMapRegex /^iz_ac02(_[a-d])?$/
+  exclusive 1
   run-once 1
   call {
     $o_map = replace_string($.InMapRegexLast,"iz_ac02","")
@@ -258,7 +258,7 @@ automacro tutorial6 {
     if (&inventory (Acolyte Manual) < 0) {
       call 6_8
     }
-    if (&inventory (Merchant Manual) < 0) {
+    if (&inventory (Merchant Manual) < 0 && $.joblvl < 10) {
       call 6_9
       call 6_9a
     }
@@ -567,7 +567,7 @@ macro set_skills {
   }
 
   $i0 = Novice Potion
-  $i0_hp = < 30
+  $i0_hp = < 50%
 }
 
 automacro set_attack0 {
@@ -616,9 +616,12 @@ automacro tutorial8 {
     call 8_1
     call 8_2
     call 8_3
-    call 8_4
-    call 8_5
-    call 8_6
+    if ($.joblvl < 10) {
+      call 8_4
+      call 8_5
+      call 8_6
+      call 8_7
+    }
   }
 }
 
@@ -642,24 +645,30 @@ macro 8_3 {
   log [Tutorial] Learn about battle
   do move 47 80
   do talknpc 59 83
-  do talknpc 59 83 r0 r0 r0
 }
 
 macro 8_4 {
   if ($.pos != 47 80) {
     do move 47 80
   }
-  do talknpc 59 83 r0 r1 r0
+  do talknpc 59 83 r0 r0 r0
 }
 
 macro 8_5 {
   if ($.pos != 47 80) {
     do move 47 80
   }
-  do talknpc 59 83 r0 r2 r0
+  do talknpc 59 83 r0 r1 r0
 }
 
 macro 8_6 {
+  if ($.pos != 47 80) {
+    do move 47 80
+  }
+  do talknpc 59 83 r0 r2 r0
+}
+
+macro 8_7 {
   if ($.pos != 47 80) {
     do move 47 80
   }
@@ -797,7 +806,12 @@ automacro tutorial8_6 {
     do talknpc 92 169 r0
     do talknpc 99 169 r0
     do move iz_ac01 49 73
-    release tutorial8_7
+    if ($.joblvl < 10) {
+      release tutorial8_7
+    } else {
+      do move izlude 128 108
+      release tutorial9
+    }
   }
   timeout 15
 }
@@ -969,7 +983,7 @@ automacro tutorial8_13 {
   exclusive 1
   priority 1
   call {
-    $map = replace_string($.InMapRegexLast,'izlude_([a-d])?$',"prt_fild08",'$1')
+    $map = replace_string($.InMapRegexLast,'izlude_?([a-d])?$',"prt_fild08",'$1')
     do move $map 367 212
     call do_tutorial_battle
   }
