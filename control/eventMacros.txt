@@ -230,7 +230,8 @@ automacro tutorial6 {
   exclusive 1
   run-once 1
   call {
-    $o_map = replace_string($.InMapRegexLast,"iz_ac02","")
+    $o_map = replace_string($.InMapRegexLast,"iz_ac02")
+	log map is $.InMapRegexLast and o_map is $o_map
     if (&inventory (Swordman Manual) < 0) {
       call 6_1
       call 6_1a
