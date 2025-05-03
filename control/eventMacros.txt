@@ -86,7 +86,7 @@ macro set_config {
 macro do_tutorial_battle {
   $loot = 1
   $attack = 2
-  $walk = 1
+  $walk = 2
   $tank = 0
 }
 
@@ -184,9 +184,30 @@ automacro tutorial4 {
   timeout 15
 }
 
+automacro tutorial4_1 {
+  InMapRegex /^izlude(_[a-d])?$/
+  QuestActive 7472
+  Zeny < 100
+  exclusive 1
+  run-once 1
+  call {
+    log [Tutorial] Sold magnifier for 100z
+    $map = $.InMapRegexLast
+    log \$map is $map
+    $map = replace_string($.InMapRegexLast,'(.*)',"",'$1_a') if ($map == izlude)
+    log \$map changed? to $map if ($map == izlude)
+    do move 121 170
+    do talknpc 124 165 s
+    do sell &inventory (Magnifier)
+    do sell done
+  }
+  timeout 15
+}
+
 automacro tutorial5 {
   InMapRegex /^izlude(_[a-d])?$/
   QuestActive 7472
+  Zeny >= 100
   CharCurrentWeight < 1000
   exclusive 1
   run-once 1
@@ -231,7 +252,7 @@ automacro tutorial6 {
   run-once 1
   call {
     $o_map = replace_string($.InMapRegexLast,"iz_ac02")
-	log map is $.InMapRegexLast and o_map is $o_map
+    log map is $.InMapRegexLast and o_map is $o_map
     if (&inventory (Swordman Manual) < 0) {
       call 6_1
       call 6_1a
@@ -623,6 +644,9 @@ automacro tutorial8 {
       call 8_6
       call 8_7
     }
+    call 8_8
+    call 8_9
+    call 8_10
   }
 }
 
@@ -676,36 +700,21 @@ macro 8_7 {
   do talknpc 59 83 r0 r3 r0
 }
 
-automacro tutorial8a {
-  InMapRegex /^iz_ac01(_[a-d])?$/
-  QuestActive 103, 104, 105
-  exclusive 1
-  run-once 1
-  priority 1
-  call {
-    log [Tutorial] report to professor about Instructors
-    do move 99 140
-    do talknpc 99 146
-    do talknpc 99 146
-  }
+macro 8_8 {
+  log [Tutorial] report to professor about Instructors
+  do move 99 140
+  do talknpc 99 146
+  do talknpc 99 146
 }
 
-automacro tutorial8b {
-  InMapRegex /^iz_ac01(_[a-d])?$/
-  QuestActive 106
-  exclusive 1
-  run-once 1
-  priority 1
-  call {
-    log [Tutorial] report to professor about Books
-    do move 99 140
-    do talknpc 99 146
-    do talknpc 99 146
-    call 8b_1
-  }
+macro 8_9 {
+  log [Tutorial] report to professor about Books
+  do move 99 140
+  do talknpc 99 146
+  do talknpc 99 146
 }
 
-macro 8b_1 {
+macro 8_10 {
   log [Tutorial] Learn about abnormal status
   do move 132 45
   do talknpc 134 47 r1
@@ -843,6 +852,14 @@ automacro tutorial8_8 {
     call set_monster
     @monster = (Little Poring, 0, 0, 0)
     call set_monster
+    @monster = (Furious Poring, 0, 0, 0)
+    call set_monster
+    @monster = (Elusive Poring, 0, 0, 0)
+    call set_monster
+    @monster = (Swift Poring, 0, 0, 0)
+    call set_monster
+    @monster = (Poring Ringleader, 0, 0, 0)
+    call set_monster
   }
   timeout 15
 }
@@ -871,6 +888,8 @@ automacro tutorial8_9 {
   call {
     log [Tutorial] hunting lunatic
     @monster = (Lunatic, 1, 0, 0)
+    call set_monster
+    @monster = (Solid Lunatic, 0, 0, 0)
     call set_monster
   }
   timeout 15
@@ -966,6 +985,11 @@ automacro tutorial8_12 {
       rewrite(Lunatic, 0, 0, 0, skip)
       rewrite(Creamy, 0, 0, 0, skip)
       rewrite(Little Poring, 0, 0, 0, skip)
+      rewrite(Furious Poring, 0, 0, 0, skip)
+      rewrite(Elusive Poring, 0, 0, 0, skip)
+      rewrite(Swift Poring, 0, 0, 0, skip)
+      rewrite(Poring Ringleader, 0, 0, 0, skip)
+      rewrite(Solid Lunatic, 0, 0, 0, skip)
 
       $map = replace_string($.InMapRegexLast,'prt_fild08([a-d])?$',"izlude",'_$1')
       do move $map 128 108
@@ -1222,17 +1246,17 @@ automacro tutorial9_10a {
 }
 
 automacro tutorial_end {
-  InMapRegex /^iz_ac01(_[a-d])?$/
+  InMapRegex /^iz_ac02(_[a-d])?$/
   QuestActive 60457
   exclusive 1
   run-once 1
   priority 1
   call {
-    $map = replace_string($.InMapRegexLast,"iz_ac01","izlude")
+    $map = replace_string($.InMapRegexLast,"iz_ac02","izlude")
     do move $map 131 145
     do talknpc 131 148 r0
     do move 27 30
-    do talknpc 27 35 r1 r0 r="$.name" r="$.name"
+    do talknpc 27 35 r1 r0 t=$.name t=$.name n
     call end
   }
 }
