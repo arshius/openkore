@@ -40,7 +40,7 @@ private 1
 ip 127.0.0.1
 port 6900
 master_version 1
-version 28
+version 55
 serverType kRO_RagexeRE_2025_03_19
 serverEncoding Western
 gameGuard 0
