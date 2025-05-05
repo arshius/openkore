@@ -3558,7 +3558,7 @@ sub canUseTeleport {
 	my ($use_lvl) = @_;
 
 	# not in game
-	return 0 if $net->getState != Network::IN_GAME;
+	return 0 if $net && $net->getState != Network::IN_GAME; # $net check is to not crash test
 
 	# 1 - check for items
 	my $item;
@@ -4190,6 +4190,22 @@ sub compilePortals {
 			next if $portals_lut{$portal}{dest}{$dest}{map} eq '';
 			$mapSpawns{$portals_lut{$portal}{dest}{$dest}{map}}{$dest}{x} = $portals_lut{$portal}{dest}{$dest}{x};
 			$mapSpawns{$portals_lut{$portal}{dest}{$dest}{map}}{$dest}{y} = $portals_lut{$portal}{dest}{$dest}{y};
+		}
+	}
+
+	foreach my $portal (keys %portals_commands) {
+		foreach my $dest (keys %{$portals_commands{$portal}{dest}}) {
+			next if $portals_commands{$portal}{dest}{$dest}{map} eq '';
+			$mapSpawns{$portals_commands{$portal}{dest}{$dest}{map}}{$dest}{x} = $portals_commands{$portal}{dest}{$dest}{x};
+			$mapSpawns{$portals_commands{$portal}{dest}{$dest}{map}}{$dest}{y} = $portals_commands{$portal}{dest}{$dest}{y};
+		}
+	}
+
+	foreach my $portal (keys %portals_spawns) {
+		foreach my $dest (keys %{$portals_spawns{$portal}{dest}}) {
+			next if $portals_spawns{$portal}{dest}{$dest}{map} eq '';
+			$mapSpawns{$portals_spawns{$portal}{dest}{$dest}{map}}{$dest}{x} = $portals_spawns{$portal}{dest}{$dest}{x};
+			$mapSpawns{$portals_spawns{$portal}{dest}{$dest}{map}}{$dest}{y} = $portals_spawns{$portal}{dest}{$dest}{y};
 		}
 	}
 
