@@ -852,14 +852,6 @@ automacro tutorial8_8 {
     call set_monster
     @monster = (Little Poring, 0, 0, 0)
     call set_monster
-    @monster = (Furious Poring, 0, 0, 0)
-    call set_monster
-    @monster = (Elusive Poring, 0, 0, 0)
-    call set_monster
-    @monster = (Swift Poring, 0, 0, 0)
-    call set_monster
-    @monster = (Poring Ringleader, 0, 0, 0)
-    call set_monster
   }
   timeout 15
 }
@@ -888,8 +880,6 @@ automacro tutorial8_9 {
   call {
     log [Tutorial] hunting lunatic
     @monster = (Lunatic, 1, 0, 0)
-    call set_monster
-    @monster = (Solid Lunatic, 0, 0, 0)
     call set_monster
   }
   timeout 15
@@ -985,11 +975,6 @@ automacro tutorial8_12 {
       rewrite(Lunatic, 0, 0, 0, skip)
       rewrite(Creamy, 0, 0, 0, skip)
       rewrite(Little Poring, 0, 0, 0, skip)
-      rewrite(Furious Poring, 0, 0, 0, skip)
-      rewrite(Elusive Poring, 0, 0, 0, skip)
-      rewrite(Swift Poring, 0, 0, 0, skip)
-      rewrite(Poring Ringleader, 0, 0, 0, skip)
-      rewrite(Solid Lunatic, 0, 0, 0, skip)
 
       $map = replace_string($.InMapRegexLast,'prt_fild08([a-d])?$',"izlude",'_$1')
       do move $map 128 108
@@ -1135,7 +1120,7 @@ automacro tutorial9_5 {
   call {
     log [Tutorial] finishing Refining quest
     do move 151 130
-    do talknpc 153 121 r="Knife" r0
+    do talknpc 153 121 r~/Knife/ r0
     do talknpc 153 126 r0
     do talknpc 145 122 r2
     do talknpc 153 126 r0 r0
@@ -1252,11 +1237,21 @@ automacro tutorial_end {
   run-once 1
   priority 1
   call {
+    log [Tutorial] join eden group
     $map = replace_string($.InMapRegexLast,"iz_ac02","izlude")
     do move $map 131 145
     do talknpc 131 148 r0
     do move 27 30
-    do talknpc 27 35 r1 r0 t=$.name t=$.name n
+    do talknpc 27 35 r1 r0 t=$.name t=$.name r5
+    do move 30 10
+    do move 173 210
+    pause 5
+    do move 174 210
+    do talk "Black Shadow#fgtg01"
+    do talk resp 0
+    do talk resp 0
+    do talk resp 0
+    do talk resp 0
     call end
   }
 }
