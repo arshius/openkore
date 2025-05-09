@@ -18,6 +18,14 @@ use base qw(Network::Receive::kRO::RagexeRE_2021_11_03);
 sub new {
 	my ($class) = @_;
 	my $self = $class->SUPER::new(@_);
+	
+	my %packets = (
+		'0B6E' => ['cash_shop_open_result', 'V2', [qw(cash_points kafra_points)]], #10
+	);
+	
+	foreach my $switch (keys %packets) {
+		$self->{packet_list}{$switch} = $packets{$switch};
+	}
 
 	return $self;
 }
