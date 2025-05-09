@@ -217,13 +217,6 @@ automacro tutorial5 {
     do talknpc 122 207
     do is &inventory (Apple Juice)
     do talknpc 122 207 r0
-    #$map = replace_string($.InMapRegexLast,"izlude","iz_ac01")
-    #do move $map 98 34
-    #do talknpc 100 39 r0
-    #do talknpc 103 42
-    #do talknpc 100 39 r2
-    #$map = replace_string($map,"1","2")
-    #do move $map 207 27
     release tutorial5_1
   }
   timeout 15
@@ -233,6 +226,7 @@ automacro tutorial5_1 {
   InMapRegex /^izlude(_[a-d])?$/
   exclusive 1
   run-once 1
+  priority 2
   call {
     log [Tutorial] Join academy
     $map = replace_string($.InMapRegexLast,"izlude","iz_ac01")
@@ -967,6 +961,7 @@ automacro tutorial8_12 {
   exclusive 1
   priority 6
   call {
+    log [Tutorial] progress $m_flag of 4
     if ($m_flag == 4) {
       log [Tutorial] go back to town
       call close_tutorial_battle
