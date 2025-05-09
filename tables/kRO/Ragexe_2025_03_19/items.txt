@@ -8747,6 +8747,7 @@
 23452#Kardui Bundle B#
 23475#Infinity Drink#
 23477#September Costume Box#
+23484#First aid Box (5)#
 23504#[Event] Crate of 20 Orange Potions#
 23505#[Event] Crate of 20 Yellow Potions#
 23506#[Event] Box of 20 White Potion#

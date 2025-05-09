@@ -20,6 +20,8 @@ sub new {
 	my $self = $class->SUPER::new(@_);
 	
 	my %packets = (
+		#'0B4C' => ['cash_shop_open_result', 'V2', [qw(cash_points kafra_points)]], #10
+		#'0B6D' => ['cash_shop_open_result', 'V2', [qw(cash_points kafra_points)]], #10
 		'0B6E' => ['cash_shop_open_result', 'V2', [qw(cash_points kafra_points)]], #10
 	);
 	
