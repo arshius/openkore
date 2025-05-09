@@ -91945,6 +91945,20 @@ Costume Royal Rabbit Crown
 Costume Weird Beard
 Costume Wrapping Ribbon
 #
+23484#
+Contains the following items:
+
+20x Freshly Squeezed Milk
+10x Novice Blue Potion
+15x Novice Magnifier
+1x [NotForSale] Concentration Potion
+1x First Aid Box(10)
+
+Caution - Items may be lost if you've exceeded the weight or carrying amount when you open the box!
+
+Base Level: 5
+Weight: 0
+#
 23504#
 Open whenever you want!
 Type: ^808080Usable^000000
