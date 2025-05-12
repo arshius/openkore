@@ -1755,3 +1755,6 @@ Spearman Scroll 10 0 0 0
 25150 0 0 0 0 0 # Hugging_Alice_Pilow
 26100 0 0 0 0 0 # Paradise_Foxtail_Staff_II
 26101 0 0 0 0 0 # Paradise_Foxtail_Staff_III
+52130 0 0 0 0 0 # 10CP_Ticket
+52131 0 0 0 0 0 # 50CP_Ticket
+52132 0 0 0 0 0 # 100CP_Ticket
