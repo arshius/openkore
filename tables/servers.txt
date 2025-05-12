@@ -6,6 +6,22 @@
 # except for when subservers were changed or reordered
 # in such a way it requires user confirmation to correctly select a subserver
 
+[Localhost - rA/Herc 2025]
+ip 10.0.0.84
+port 6900
+master_version 1
+version 55
+serverType kRO_RagexeRE_2025_03_19
+serverEncoding Western
+gameGuard 0
+storageEncryptKey 0x050B6F79, 0x0202C179, 0x0E20120, 0x04FA43E3, 0x0179B6C8, 0x05973DF2, 0x07D8D6B, 0x08CB9ED9
+addTableFolders kRO/Ragexe_2025_03_19;iRO
+charBlockSize 175
+pinCode 0
+charDeleteDateType 1
+rankingSystemType 1
+private 1
+
 [Localhost - rA/Herc 2021]
 ip 10.0.0.84
 port 6900
