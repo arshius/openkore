@@ -1,5 +1,16 @@
 for x in $@
 do
+    if [ ! -d "$x" ]; then
+        mkdir $x
+    fi
+	if [ ! -f "$x" ]; then
+		cp config$x.txt $x/config.txt
+		cp config$x.txt $x/config_.txt
+	else 
+		cp config${x%??}.txt $x/config.txt
+		cp config${x%??}.txt $x/config_.txt
+	fi
+    cp mon_control.txt $x/mon_control.txt
     ln arrowcraft.txt $x/arrowcraft.txt
     ln avoid.txt $x/avoid.txt
     ln buyer_shop.txt $x/buyer_shop.txt
@@ -10,10 +21,10 @@ do
     ln overallAuth.txt $x/overallAuth.txt
     ln pickupitems.txt $x/pickupitems.txt
     ln poseidon.txt $x/poseidon.txt
-	ln priority.txt $x/priority.txt
-	ln responses.txt $x/responses.txt
-	ln routeweights.txt $x/routeweights.txt
-	ln shop.txt $x/shop.txt
-	ln sys.txt $x/sys.txt
-	ln timeouts.txt $x/timeouts.txt
+    ln priority.txt $x/priority.txt
+    ln responses.txt $x/responses.txt
+    ln routeweights.txt $x/routeweights.txt
+    ln shop.txt $x/shop.txt
+    ln sys.txt $x/sys.txt
+    ln timeouts.txt $x/timeouts.txt
 done
