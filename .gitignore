@@ -47,6 +47,10 @@ tables/**/portalsLOS.txt
 tables/pserver/**/portalsLOS.txt
 tables/**/npcs.txt
 tables/**/monsters.txt
+manual/
+control/_*_f/
+control/_*_m/
+control/_*/
 *.xpm
 *.weight
 *Zone.Identifier
