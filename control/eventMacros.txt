@@ -54,7 +54,7 @@ automacro block_all {
   exclusive 1
   run-once 1
   call {
-  lock all
+    lock all
   }
   timeout 15
 }
@@ -1349,4 +1349,3 @@ sub rewrite {
   print FILE join "\n", @lines;
   close FILE;
 }
-

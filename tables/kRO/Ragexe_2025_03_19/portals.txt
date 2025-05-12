@@ -583,4 +583,5 @@ prontera 146 89 geffen 120 39 1200 1 c r2 c r1
 prontera 146 89 payon 161 58 1200 1 c r2 c r2
 prontera 146 89 morocc 156 47 1200 1 c r2 c r3
 prontera 146 89 gef_fild10 52 326 1700 1 c r2 c r4
-prontera 146 89 alberta 117 56 1800 1 c r2 c r5
+prontera 146 89 alberta 117 56 1800 1 c r2 c r5prontera 156 22 prt_fild08 170 378
+prontera 156 22 prt_fild08 170 378
