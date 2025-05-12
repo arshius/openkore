@@ -3,12 +3,12 @@
 
 ######## Login options and server-specific options ########
 
-master Localhost - rA/Herc 2021
+master 
 server 0
-username admin
-password 123456
+username 
+password 
 loginPinCode
-char 1
+char 
 
 # Poseidon Settings: https://openkore.com/wiki/Poseidon
 # They must be the same as Query Server config in Poseidon.txt
