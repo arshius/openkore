@@ -68,7 +68,7 @@ automacro initialize_configs {
 }
 
 automacro set_config {
-  ConfigKeyNot itemsTakeAuto $loot, attackAuto $attack, route_randomWalk $walk, tankMode $tank
+  ConfigKeyNot itemsTakeAuto $loot, attackAuto $attack, route_randomWalk $walk, tankMode $tank, attackLooters $looter
   CheckOnAI auto, manual
   exclusive 1
   priority 1
@@ -88,6 +88,7 @@ macro do_tutorial_battle {
   $attack = 2
   $walk = 2
   $tank = 0
+  $looter = 1
 }
 
 macro close_tutorial_battle {
@@ -95,6 +96,7 @@ macro close_tutorial_battle {
   $attack = -1
   $walk = 0
   $tank = 1
+  $looter = 0
 }
 
 automacro tutorial1 {
@@ -193,10 +195,8 @@ automacro tutorial4_1 {
   call {
     log [Tutorial] Sold magnifier for 100z
     $map = $.InMapRegexLast
-    log \$map is $map
-    $map = replace_string($.InMapRegexLast,'(.*)',"",'$1_a') if ($map == izlude)
-    log \$map changed? to $map if ($map == izlude)
-    do move 121 170
+    $map = replace_string($.InMapRegexLast,"de","de_a") if ($map == izlude)
+    do move $map 121 170
     do talknpc 124 165 s
     do sell &inventory (Magnifier)
     do sell done
@@ -224,6 +224,7 @@ automacro tutorial5 {
 
 automacro tutorial5_1 {
   InMapRegex /^izlude(_[a-d])?$/
+  QuestInactive 7472
   exclusive 1
   run-once 1
   priority 2
@@ -795,6 +796,21 @@ automacro tutorial8_5 {
     do pet capture $.MobNearLastBinId
   }
   timeout 0.5
+}
+
+automacro tutorial8_5a {
+  InMapRegex /^new_1-([1-4])?$/
+  MobNear /^Little Poring/
+  InInventory "Little Unripe Apple" < 1
+  InInventory "Little Poring Egg" < 1
+  QuestActive 2296
+  priority 2
+  call {
+    log [Tutorial] Get Another Apple
+    do move 97 165
+    do talknpc 99 169 r0
+  }
+  timeout 5
 }
 
 automacro tutorial8_6 {
