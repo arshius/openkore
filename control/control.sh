@@ -4,27 +4,27 @@ do
         mkdir $x
     fi
 	if [ ! -f "$x" ]; then
-		cp config$x.txt $x/config.txt
-		cp config$x.txt $x/config_.txt
+		cp -f config$x.txt $x/config.txt
+		cp -f config$x.txt $x/config_.txt
 	else 
-		cp config${x%??}.txt $x/config.txt
-		cp config${x%??}.txt $x/config_.txt
+		cp -f config${x%??}.txt $x/config.txt
+		cp -f config${x%??}.txt $x/config_.txt
 	fi
-    cp mon_control.txt $x/mon_control.txt
-    ln -s arrowcraft.txt $x/arrowcraft.txt
-    ln -s avoid.txt $x/avoid.txt
-    ln -s buyer_shop.txt $x/buyer_shop.txt
-    ln -s chat_resp.txt $x/chat_resp.txt
-    ln -s consolecolors.txt $x/consolecolors.txt
-    ln -s eventMacros.txt $x/eventMacros.txt
-    ln -s items_control.txt $x/items_control.txt
-    ln -s overallAuth.txt $x/overallAuth.txt
-    ln -s pickupitems.txt $x/pickupitems.txt
-    ln -s poseidon.txt $x/poseidon.txt
-    ln -s priority.txt $x/priority.txt
-    ln -s responses.txt $x/responses.txt
-    ln -s routeweights.txt $x/routeweights.txt
-    ln -s shop.txt $x/shop.txt
-    ln -s sys.txt $x/sys.txt
-    ln -s timeouts.txt $x/timeouts.txt
+    ln -f arrowcraft.txt $x/arrowcraft.txt
+    ln -f avoid.txt $x/avoid.txt
+    ln -f buyer_shop.txt $x/buyer_shop.txt
+    ln -f chat_resp.txt $x/chat_resp.txt
+    ln -f consolecolors.txt $x/consolecolors.txt
+    ln -f eventMacros.txt $x/eventMacros.txt
+    cp -f items_control.txt $x/items_control.txt
+	cp -f mon_control.txt $x/mon_control.txt
+    ln -f overallAuth.txt $x/overallAuth.txt
+    ln -f pickupitems.txt $x/pickupitems.txt
+    ln -f poseidon.txt $x/poseidon.txt
+    ln -f priority.txt $x/priority.txt
+    ln -f responses.txt $x/responses.txt
+    ln -f routeweights.txt $x/routeweights.txt
+    ln -f shop.txt $x/shop.txt
+    ln -f sys.txt $x/sys.txt
+    ln -f timeouts.txt $x/timeouts.txt
 done
