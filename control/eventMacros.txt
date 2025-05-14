@@ -20,6 +20,7 @@ automacro initialize {
   exclusive 1
   run-once 1
   call {
+    @h_flag  = (0,0,0,0)
     $m_flag  = 0
     $step = 15
     $a_skills = 1
@@ -871,13 +872,15 @@ automacro tutorial8_8a {
   QuestHuntCompleted 11339 1002
   InInventory "Jellopy" >= 5
   exclusive 1
-  run-once 1
   priority 5
   call {
-    log [Tutorial] stop hunting poring
-    $m_flag++
-    @monster = (Poring, 0, 0, 0)
-    call set_monster
+    if ($h_flag[0] == 0) {
+      log [Tutorial] stop hunting poring
+      $m_flag++
+      $h_flag[0] = 1
+      @monster = (Poring, 0, 0, 0)
+      call set_monster
+    }
   }
   timeout 15
 }
@@ -900,13 +903,15 @@ automacro tutorial8_9a {
   QuestHuntCompleted 11340 1063
   InInventory "Carrot" >= 1
   exclusive 1
-  run-once 1
   priority 5
   call {
-    log [Tutorial] stop hunting lunatic
-    $m_flag++
-    @monster = (Lunatic, 0, 0, 0)
-    call set_monster
+    if ($h_flag[1] == 0) {
+      log [Tutorial] stop hunting lunatic
+      $m_flag++
+      $h_flag[1] = 1
+      @monster = (Lunatic, 0, 0, 0)
+      call set_monster
+    }
   }
   timeout 15
 }
@@ -929,13 +934,15 @@ automacro tutorial8_10a {
   QuestHuntCompleted 11341 1007
   InInventory "Fluff" >= 3
   exclusive 1
-  run-once 1
   priority 5
   call {
-    log [Tutorial] stop hunting fabre
-    $m_flag++
-    @monster = (Fabre, 0, 0, 0)
-    call set_monster
+    if ($h_flag[2] == 0) {
+      log [Tutorial] stop hunting fabre
+      $m_flag++
+      $h_flag[2] = 1
+      @monster = (Fabre, 0, 0, 0)
+      call set_monster
+    }
   }
   timeout 15
 }
@@ -960,13 +967,15 @@ automacro tutorial8_11a {
   QuestHuntCompleted 11344 1008
   InInventory "Shell" >= 2
   exclusive 1
-  run-once 1
   priority 5
   call {
-    log [Tutorial] stop hunting pupa
-    $m_flag++
-    @monster = (Pupa, 0, 0, 0)
-    call set_monster
+    if ($h_flag[3] == 0) {
+      log [Tutorial] stop hunting pupa
+      $m_flag++
+      $h_flag[3] = 1
+      @monster = (Pupa, 0, 0, 0)
+      call set_monster
+    }
   }
   timeout 15
 }
@@ -977,8 +986,9 @@ automacro tutorial8_12 {
   exclusive 1
   priority 6
   call {
-    log [Tutorial] progress $m_flag of 4
-    if ($m_flag == 4) {
+    log [Tutorial] progress $h_flag[0], $h_flag[1], $h_flag[2], $h_flag[3]
+    #if ($m_flag == 4) {
+    if ($h_flag[0] == 1 && $h_flag[1] == 1 && $h_flag[2] == 1 && $h_flag[3] == 1) {
       log [Tutorial] go back to town
       call close_tutorial_battle
       rewrite(Fabre, 0, 0, 0, skip)
@@ -1254,6 +1264,7 @@ automacro tutorial_end {
     do talknpc 131 148 r0
     do move 27 30
     do talknpc 27 35 r1 r0 t=$.name t=$.name r5
+    do talknpc 17 37 r2 r0
     do move 30 10
     do move 173 210
     pause 5
