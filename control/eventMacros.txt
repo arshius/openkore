@@ -852,6 +852,16 @@ automacro tutorial8_7 {
   timeout 15
 }
 
+automacro tutorial8_7a {
+  InMapRegex /^prt_fild08([a-d])?$/
+  exclusive 1
+  run-once 1
+  call {
+    do conf lockMap $.InMapRegexLast
+  }
+  timeout 15
+}
+
 automacro tutorial8_8 {
   InMapRegex /^prt_fild08([a-d])?$/
   QuestActive 11339
@@ -999,6 +1009,7 @@ automacro tutorial8_12 {
 
       $map = replace_string($.InMapRegexLast,'prt_fild08([a-d])?$',"izlude",'_$1')
       do move $map 128 108
+      do conf lockMap none
       lock tutorial8_12
       lock tutorial8_13
       release tutorial9
