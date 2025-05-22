@@ -3,13 +3,13 @@ do
     if [ ! -d "$x" ]; then
         mkdir $x
     fi
-	if [ ! -f "$x" ]; then
-		cp -f config$x.txt $x/config.txt
-		cp -f config$x.txt $x/config_.txt
-	else 
-		cp -f config${x%??}.txt $x/config.txt
-		cp -f config${x%??}.txt $x/config_.txt
-	fi
+    if [ -f "$x/config_.txt" ]; then
+        cp -f config$x.txt $x/config.txt
+        cp -f $x/config_.txt $x/config.txt
+    else 
+        cp -f config${x%??}.txt $x/config.txt
+        cp -f config${x%??}.txt $x/config_.txt
+    fi
     ln -f arrowcraft.txt $x/arrowcraft.txt
     ln -f avoid.txt $x/avoid.txt
     ln -f buyer_shop.txt $x/buyer_shop.txt
@@ -17,7 +17,7 @@ do
     ln -f consolecolors.txt $x/consolecolors.txt
     ln -f eventMacros.txt $x/eventMacros.txt
     cp -f items_control.txt $x/items_control.txt
-	cp -f mon_control.txt $x/mon_control.txt
+    cp -f mon_control.txt $x/mon_control.txt
     ln -f overallAuth.txt $x/overallAuth.txt
     ln -f pickupitems.txt $x/pickupitems.txt
     ln -f poseidon.txt $x/poseidon.txt
