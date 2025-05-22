@@ -43,7 +43,7 @@ automacro initialize {
     lock tutorial9_6
     lock tutorial9_9
     lock tutorial9_10
-    lock tutorial_end
+    lock tutorial9_11
     do ai manual
   }
   timeout 15
@@ -68,7 +68,7 @@ automacro initialize_configs {
   call set_config
 }
 
-automacro set_config {
+automacro set_battle_config {
   ConfigKeyNot itemsTakeAuto $loot, attackAuto $attack, route_randomWalk $walk, tankMode $tank, attackLooters $looter
   CheckOnAI auto, manual
   exclusive 1
@@ -496,7 +496,7 @@ macro set_eq {
   $head = 18730 #topHead
   $off  = 2112  #leftHand
   $main = 1243  #rightHand
-  $robe  = 2510 #robe
+  $robe = 2510  #robe
   $body = 2352  #armor
   $foot = 2414  #shoes
   if ($conf[0] > 0) {
@@ -1258,11 +1258,11 @@ automacro tutorial9_10a {
     $map = replace_string($.InMapRegexLast,"1","2")
     do move $map 103 200
     do talknpc 103 209
-    release tutorial_end
+    release tutorial9_11
   }
 }
 
-automacro tutorial_end {
+automacro tutorial9_11 {
   InMapRegex /^iz_ac02(_[a-d])?$/
   QuestActive 60457
   exclusive 1
@@ -1277,19 +1277,37 @@ automacro tutorial_end {
     do talknpc 27 35 r1 r0 t=$.name t=$.name r5
     do talknpc 17 37 r2 r0
     do move 30 10
-    do move 173 210
-    pause 5
+    #do move 173 210
+    #pause 5
     do move 174 210
+    lock set_equip
+    #do talk "Black Shadow#fgtg01"
+    #do talk resp 0
+    #do talk resp 0
+    #do talk resp 0
+    #do talk resp 0
+    #call tutorial_end
+  }
+}
+
+automacro tutorial9_11a {
+  InMapRegex /^izlude(_[a-d])?$/
+  NpcNear /Black Shadow/
+  exclusive 1
+  run-once 1
+  priority 2
+  call {
+    log [Tutorial] get shorty
     do talk "Black Shadow#fgtg01"
     do talk resp 0
     do talk resp 0
     do talk resp 0
     do talk resp 0
-    call end
+    call tutorial_end
   }
 }
 
-macro end {
+macro tutorial_end {
   call do_tutorial_battle
   $s0 = none
   $s0_lvl = none
@@ -1312,7 +1330,6 @@ macro end {
   $os0_w_eq = none
   $i0 = none
   $i0_hp = none
-  lock all
 }
 
 macro set_monster {
