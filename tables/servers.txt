@@ -7,7 +7,7 @@
 # in such a way it requires user confirmation to correctly select a subserver
 
 [Localhost - rA/Herc 2025]
-ip 10.0.0.84
+ip 10.0.0.42
 port 6900
 master_version 1
 version 55
