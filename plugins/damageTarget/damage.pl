@@ -36,7 +36,7 @@ sub Unload {
 sub onDamage {
 	my $args = AI::args;
 	my $ID = $args->{ID};
-	
+
 	my $target = Actor::get($ID) if (defined($ID));
 	my $damage = $target->{dmgFromYou} if defined($target);
 	#message "\$damage is $damage\n" if (defined($damage));
@@ -76,7 +76,7 @@ sub onCommand {
 	#message "\$self->{vars} from hook is ", %vars,"\n";
 	#message "\$self->{variables} from hook is ", %variables,"\n";
 	#message "\$self->{variables}2 from hook is $variables2\n";
-	
+
 	#while ( my( $key, $value ) = each %{$self->{vars}} ) {
 		#if (ref($value) eq 'ARRAY') {
 	#		$eventMacro->set_full_array(".".$self->{name}."Last".ucfirst($key), \@{$value});
